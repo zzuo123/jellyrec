@@ -1,0 +1,37 @@
+async function authenticate(baseurl, name, pw){
+    // authenticate user using username and password, returns access token and user id
+    const response = await fetch(baseurl+"/Users/authenticatebyname", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": 'MediaBrowser Client="JellyRec", Device="JellyRecBackend", DeviceId="JellyRecBackend", Version="1.0.0"'
+        },
+        body: JSON.stringify({ Pw: pw, Username: name}),
+    });
+    if (!response.ok) {
+        return null;
+    }
+    const result = await response.json();
+    return { token: result["AccessToken"], uid: result["User"]["Id"] };
+}
+
+async function deauthenticate(baseurl, token){
+    // deauthenticate user using access token
+    const url = baseurl+"/Auth/keys/"+token;
+    const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": 'MediaBrowser Client="JellyRec", Device="JellyRecBackend", DeviceId="JellyRecBackend", Version="1.0.0", Token="'+token+'"'
+        }
+    });
+    if (response.status != 204) {
+        return false;
+    }
+    return true;
+}
+
+export default {
+    authenticate,
+    deauthenticate
+}
