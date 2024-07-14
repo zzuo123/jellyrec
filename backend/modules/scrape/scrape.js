@@ -17,6 +17,5 @@ async function getMostRecentShows(baseurl, uid, token){
 }
 
 export default {
-    authenticate,
-    deauthenticate
+    getMostRecentShows
 }
