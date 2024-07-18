@@ -15,11 +15,11 @@ async function authenticate(baseurl, name, pw){
     return { token: result["AccessToken"], uid: result["User"]["Id"] };
 }
 
-async function deauthenticate(baseurl, token){
-    // deauthenticate user using access token
-    const url = baseurl+"/Auth/keys/"+token;
+async function logout(baseurl, token){
+    // reports to the server that the user has logged out (leave token handling to the server)
+    const url = baseurl+"/Sessions/Logout";
     const response = await fetch(url, {
-        method: "DELETE",
+        method: "Post",
         headers: {
             "Content-Type": "application/json",
             "Authorization": 'MediaBrowser Client="JellyRec", Device="JellyRecBackend", DeviceId="JellyRecBackend", Version="1.0.0", Token="'+token+'"'
@@ -33,5 +33,5 @@ async function deauthenticate(baseurl, token){
 
 export default {
     authenticate,
-    deauthenticate
+    logout
 }

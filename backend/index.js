@@ -12,34 +12,48 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
-let baseurl = null;
-let token = null;
-let uid = null;
+let userinfo = {
+    baseurl: null,
+    token: null,
+    uid: null
+};
 
-app.post('/login', async (req, res) => {
+
+app.post('/Auth/login', async (req, res) => {
     const { url, username, password } = req.body;
-    baseurl = url;
+    userinfo.baseurl = url;
     logger.info(`POST /login: received login request for ${username}`);
     const result = await auth.authenticate(baseurl, username, password);
     if (result === null || result === undefined) {
+        logger.error(`POST /login: user ${username} not authenticated`);
         res.status(401).json({ message: 'Invalid url or username or password... Please retry.' });
         return;
     }
+    logger.info(`POST /login: user ${username} authenticated`);
+    userinfo.token = result.token;
+    userinfo.uid = result.uid;
     res.json({ message: 'ok', token: result.token, uid: result.uid });     // this is for testing
     // res.json({ message: 'ok' });  // this is for prod
     token = result.token;
     uid = result.uid;
 });
 
-app.post('/logout', async (req, res) => {
+app.post('/Auth/logout', async (req, res) => {
     logger.info(`POST /logout: received logout request`);
-    const result = await auth.deauthenticate(baseurl, token);
+    const result = await auth.logout(baseurl, token);
+    userinfo.baseurl = null;
+    userinfo.token = null;
+    userinfo.uid = null;
     if (result === false) {
-        res.status(401).json({ message: 'Invalid token' });
+        logger.error(`POST /logout: error logging out of session`);
+        res.status(401).json({ message: 'Error logging out of session' });
         return;
     }
+    logger.info(`POST /logout: user logged out`);
     res.json({ message: 'ok' });
 });
+
+app.get('/Movie/GetFavorite');
 
 app.listen(port, () => {
     logger.info(`Listening on port ${port}`);
