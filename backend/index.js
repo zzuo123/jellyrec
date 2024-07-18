@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import logger from './modules/log/logger.js';
 import auth from './modules/auth/auth.js';
 import scraper from './modules/scraper/scraper.js';
+import output from './modules/output/output.js';
 
 const port = process.env.PORT || 4001;
 
@@ -88,6 +89,7 @@ app.get('/Movie/GetFavorite', async (req, res) => {
         return;
     }
     logger.info(`GET /Movie/GetFavorite: favorite movies retrieved`);
+    userinfo.favMovies = result;
     res.json(result);
 });
 
@@ -109,7 +111,21 @@ app.get('/Show/GetFavorite', async (req, res) => {
         return;
     }
     logger.info(`GET /Show/GetFavorite: favorite shows retrieved`);
+    userinfo.favShows = result;
     res.json(result);
+});
+
+app.post('/Movie/GetRecommendation', async (req, res) => {
+    if (!checkLogin(res)) {
+        return;
+    }
+    if(output.cacheUserInfo(userinfo)) {
+        logger.info(`POST /Movie/GetRecommendation: user ${userinfo.uid} info cached`);
+        res.json({ message: 'ok' });
+    } else {
+        logger.error(`POST /Movie/GetRecommendation: error caching user ${userinfo.uid} info`);
+        res.status(401).json({ message: 'Error caching user info' });
+    }
 });
 
 
