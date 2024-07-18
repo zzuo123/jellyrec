@@ -43,7 +43,7 @@ async function getMostRecentMovies(baseurl, uid, token){
 // ============================================================
 
 async function getFavShows(baseurl, uid, token){
-    const url = baseurl+"/api/Users/"+uid+"/Items?Recursive=true&SortBy=DatePlayed&SortOrder=Descending&Fields=DatePlayed&IncludeItemTypes=Show&isFavorite=true";
+    const url = baseurl+"/Users/"+uid+"/Items?Recursive=true&SortBy=DatePlayed&SortOrder=Descending&Fields=DatePlayed&IncludeItemTypes=Series&isFavorite=true";
     const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -60,7 +60,7 @@ async function getFavShows(baseurl, uid, token){
 }
 
 async function getFavMovies(baseurl, uid, token){
-    const url = baseurl+"/api/Users/"+uid+"/Items?Recursive=true&SortBy=DatePlayed&SortOrder=Descending&Fields=DatePlayed&IncludeItemTypes=Movie&isFavorite=true";
+    const url = baseurl+"/Users/"+uid+"/Items?Recursive=true&SortBy=DatePlayed&SortOrder=Descending&Fields=DatePlayed&IncludeItemTypes=Movie&isFavorite=true";
     const response = await fetch(url, {
         method: "GET",
         headers: {
