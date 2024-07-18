@@ -133,11 +133,12 @@ app.post('/Run/Python', (req, res) => {
     // if (!checkLogin(res)) {
     //     return;
     // }
-    const pythonProcess = spawn.spawn('python', ['./modules/generate/generate.py', 'arg1', 'arg2']);
+    const pythonProcess = spawn.spawn('python', ['./modules/generate/generate.py', '93f7ef9c38c946829b359d4f5c523eee', 'arg2']);
     
     pythonProcess.stdout.on('data', (data) => {
-        res.json({ Message: `stdout: ${data.toString()}` });
-        console.log(`stdout: ${data}`);
+        let result = JSON.parse(data.toString());
+        res.json(result);
+        // console.log(`stdout: ${data}`);
     });
 
     pythonProcess.stderr.on('data', (data) => {
