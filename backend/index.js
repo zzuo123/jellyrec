@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import spawn from 'child_process';
 import logger from './modules/log/logger.js';
 import auth from './modules/auth/auth.js';
 import scraper from './modules/scraper/scraper.js';
@@ -126,6 +127,27 @@ app.post('/Movie/GetRecommendation', async (req, res) => {
         logger.error(`POST /Movie/GetRecommendation: error caching user ${userinfo.uid} info`);
         res.status(401).json({ message: 'Error caching user info' });
     }
+});
+
+app.post('/Run/Python', (req, res) => {
+    // if (!checkLogin(res)) {
+    //     return;
+    // }
+    const pythonProcess = spawn.spawn('python', ['./modules/generate/generate.py', 'arg1', 'arg2']);
+    
+    pythonProcess.stdout.on('data', (data) => {
+        res.json({ Message: `stdout: ${data.toString()}` });
+        console.log(`stdout: ${data}`);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    pythonProcess.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+    });
+
 });
 
 
