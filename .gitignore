@@ -2,3 +2,5 @@ package*.json
 *.log
 node_modules/
 data.json
+.ipynb_checkpoints/
+ml-latest-small/
