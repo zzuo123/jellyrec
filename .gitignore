@@ -4,3 +4,6 @@ node_modules/
 data.json
 .ipynb_checkpoints/
 ml-latest-small/
+downloads/
+__pycache__/
+ml-latest/
