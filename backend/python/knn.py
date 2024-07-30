@@ -4,15 +4,28 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from convert import imdb_to_movieid, movieid_to_imdb, movieid_to_title
+import pickle
+
 
 base_path = os.path.abspath(os.path.dirname(__file__)) + '/downloads/'
-full_dataset_path = base_path + 'ml-latest/ml-latest/'
+full_dataset_path = base_path + 'ml-latest-filtered/ml-latest-filtered/'
 small_dataset_path = base_path + 'ml-latest-small/ml-latest-small/'
+
 
 def get_user_item_matrix(full_dataset=False):
     '''
     Read the ratings.csv file and return a user-item matrix
     '''
+    # check if the pickled user-item matrix exists
+    if full_dataset:
+        pickle_path = full_dataset_path + 'user_item_matrix.pkl'
+    else:
+        pickle_path = small_dataset_path + 'user_item_matrix.pkl'
+    if os.path.exists(pickle_path):
+        with open(pickle_path, 'rb') as f:
+            user_item_matrix = pickle.load(f)
+        return user_item_matrix
     
     # read the ratings file
     if full_dataset:
@@ -21,11 +34,13 @@ def get_user_item_matrix(full_dataset=False):
         ratings_path = small_dataset_path + 'ratings.csv'
     ratings = pd.read_csv(ratings_path)
     
-    # create the user-item matrix
+    # create the user-item matrix and fill missing values with 0
     user_item_matrix = ratings.pivot(index='userId', columns='movieId', values='rating')
-    
-    # fill missing values with 0
     user_item_matrix = user_item_matrix.fillna(0)
+
+    # pickle the user-item matrix
+    with open(pickle_path, 'wb') as f:
+        pickle.dump(user_item_matrix, f)
     
     return user_item_matrix
 
@@ -57,6 +72,15 @@ def cosine_knn_model(full_dataset=False):
     - cosine similarity model
     - mapping from movie ids to indices in the matrix
     '''
+    # check if the pickled cosine similarity model exists
+    if full_dataset:
+        pickle_path = full_dataset_path + 'cosine_sim_model.pkl'
+    else:
+        pickle_path = small_dataset_path + 'cosine_sim_model.pkl'
+    if os.path.exists(pickle_path):
+        with open(pickle_path, 'rb') as f:
+            cosine_sim_model, mapping_movie = pickle.load(f)
+        return cosine_sim_model, mapping_movie
 
     # get the user-item matrix
     user_item_matrix = get_user_item_matrix(full_dataset)
@@ -65,74 +89,13 @@ def cosine_knn_model(full_dataset=False):
     # mapping_user = Mapping(user_item_matrix.index)
     mapping_movie = Mapping(user_item_matrix.columns)
     user_item_matrix = user_item_matrix.values
-
     cosine_sim_model = cosine_similarity(user_item_matrix.T)
+
+    # pickle the cosine similarity model
+    with open(pickle_path, 'wb') as f:
+        pickle.dump((cosine_sim_model, mapping_movie), f)
+
     return cosine_sim_model, mapping_movie
-
-
-def imdb_to_movieid(imdb_id_lst, full_dataset=False):
-    '''
-    Convert a list of imdb ids to movie ids
-    Args:
-    - imdb_id_lst: list of imdb ids
-    - full_dataset: whether to use the full dataset
-    Returns:
-    - list of movie ids
-    '''
-    if full_dataset:
-        links_path = full_dataset_path + 'links.csv'
-    else:
-        links_path = small_dataset_path + 'links.csv'
-    movies = pd.read_csv(links_path)
-    movie_ids = []
-    for imdb_id in imdb_id_lst:
-        if imdb_id.startswith('tt'):    # remove the 'tt' prefix
-            imdb_id = int(imdb_id[2:])
-        movie_id = movies[movies['imdbId'] == imdb_id]['movieId'].values[0]
-        movie_ids.append(movie_id)
-    return movie_ids   
-
-
-def movieid_to_imdb(movie_id_lst, full_dataset=False):
-    '''
-    Convert a list of movie ids to imdb ids
-    Args:
-    - movie_id_lst: list of movie ids
-    - full_dataset: whether to use the full dataset
-    Returns:
-    - list of imdb ids
-    '''
-    if full_dataset:
-        links_path = full_dataset_path + 'links.csv'
-    else:
-        links_path = small_dataset_path + 'links.csv'
-    movies = pd.read_csv(links_path)
-    imdb_ids = []
-    for movie_id in movie_id_lst:
-        imdb_id = movies[movies['movieId'] == movie_id]['imdbId'].values[0]
-        imdb_ids.append(f'tt{imdb_id}')
-    return imdb_ids
-
-
-def movieid_to_title(movie_id_lst, full_dataset=False):
-    '''
-    Convert a list of movie ids to movie titles
-    Args:
-    - movie_id_lst: list of movie ids
-    - full_dataset: whether to use the full dataset
-    Returns:
-    - list of movie titles
-    '''
-    if full_dataset:
-        movies_path = full_dataset_path + 'movies.csv'
-    else:
-        movies_path = small_dataset_path + 'movies.csv'
-    movies = pd.read_csv(movies_path)
-    titles = []
-    for movie_id in movie_id_lst:
-        title = movies[movies['movieId'] == movie_id]['title'].values[0]
-        titles.append(title)
-    return titles
     
 
 def recommend_movies(fav_movies_imdb, n=10, full_dataset=False):
