@@ -9,15 +9,16 @@ import pickle
 
 
 base_path = os.path.abspath(os.path.dirname(__file__)) + '/downloads/'
-full_dataset_path = base_path + 'ml-latest-filtered/ml-latest-filtered/'
+full_dataset_path = base_path + 'ml-latest/ml-latest/'
 small_dataset_path = base_path + 'ml-latest-small/ml-latest-small/'
 
 
-def get_user_item_matrix(full_dataset=False):
+def get_user_item_matrix(full_dataset=False, full_dataset_options=None):
     '''
     Read the ratings.csv file and return a user-item matrix
     '''
     # check if the pickled user-item matrix exists
+    
     if full_dataset:
         pickle_path = full_dataset_path + 'user_item_matrix.pkl'
     else:
@@ -26,13 +27,19 @@ def get_user_item_matrix(full_dataset=False):
         with open(pickle_path, 'rb') as f:
             user_item_matrix = pickle.load(f)
         return user_item_matrix
-    
+
     # read the ratings file
     if full_dataset:
         ratings_path = full_dataset_path + 'ratings.csv'
     else:
         ratings_path = small_dataset_path + 'ratings.csv'
     ratings = pd.read_csv(ratings_path)
+
+    if full_dataset:
+        # filter the ratings to the specified options
+        ratings = ratings.groupby('userId').filter(lambda x: len(x) >= full_dataset_options['user_min'])
+        ratings = ratings.groupby('movieId').filter(lambda x: len(x) >= full_dataset_options['movie_min'])
+        ratings = ratings.groupby('userId').filter(lambda x: len(x) <= full_dataset_options['user_max'])
     
     # create the user-item matrix and fill missing values with 0
     user_item_matrix = ratings.pivot(index='userId', columns='movieId', values='rating')
@@ -65,7 +72,17 @@ class Mapping:
         return [self.index_to_id[index] for index in indices]
 
 
-def cosine_knn_model(full_dataset=False):
+def compare_options(options1, options2):
+    '''
+    Compare two options dictionaries
+    '''
+    for key in options1:
+        if options1[key] != options2[key]:
+            return False
+    return True
+
+
+def cosine_knn_model(full_dataset, full_dataset_options):
     '''
     Generate a cosine similarity model for k-nearest neighbors
     Returns:
@@ -75,18 +92,31 @@ def cosine_knn_model(full_dataset=False):
     # check if the pickled cosine similarity model exists
     if full_dataset:
         pickle_path = full_dataset_path + 'cosine_sim_model.pkl'
+        option_path = full_dataset_path + 'cosine_sim_model_options.pkl'
     else:
         pickle_path = small_dataset_path + 'cosine_sim_model.pkl'
+        option_path = None  # small dataset doesn't need options to filter data
     if os.path.exists(pickle_path):
-        with open(pickle_path, 'rb') as f:
-            cosine_sim_model, mapping_movie = pickle.load(f)
-        return cosine_sim_model, mapping_movie
+        if full_dataset:
+            if os.path.exists(option_path):
+                with open(option_path, 'rb') as f:
+                    options = pickle.load(f)
+                if compare_options(options, full_dataset_options):
+                    with open(pickle_path, 'rb') as f:
+                        cosine_sim_model, mapping_movie = pickle.load(f)
+                    return cosine_sim_model, mapping_movie
+            # options doesn't exist or updated
+            with open(option_path, 'wb') as f:
+                pickle.dump(full_dataset_options, f)
+        else:
+            with open(pickle_path, 'rb') as f:
+                cosine_sim_model, mapping_movie = pickle.load(f)
+            return cosine_sim_model, mapping_movie
 
     # get the user-item matrix
-    user_item_matrix = get_user_item_matrix(full_dataset)
+    user_item_matrix = get_user_item_matrix(full_dataset, full_dataset_options)
 
     # mapping from user and movie ids to indices in the matrix (before converting to np array)
-    # mapping_user = Mapping(user_item_matrix.index)
     mapping_movie = Mapping(user_item_matrix.columns)
     user_item_matrix = user_item_matrix.values
     cosine_sim_model = cosine_similarity(user_item_matrix.T)
@@ -98,12 +128,12 @@ def cosine_knn_model(full_dataset=False):
     return cosine_sim_model, mapping_movie
     
 
-def recommend_movies(fav_movies_imdb, n=10, full_dataset=False):
+def recommend_movies(fav_movies_imdb, n=10, full_dataset=False, full_dataset_options={'user_min': 300, 'movie_min': 50, 'user_max': 500}):
     '''
     Recommend n movies based on the cosine similarity model
     '''
     # get the cosine similarity model and mapping
-    cosine_sim_model, mapping_movie = cosine_knn_model(full_dataset)
+    cosine_sim_model, mapping_movie = cosine_knn_model(full_dataset, full_dataset_options)
 
     # convert the favorite movies imdb ids to movie ids
     fav_movies = imdb_to_movieid(fav_movies_imdb, full_dataset)

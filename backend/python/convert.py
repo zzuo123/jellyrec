@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 base_path = os.path.abspath(os.path.dirname(__file__)) + '/downloads/'
-full_dataset_path = base_path + 'ml-latest-filtered/ml-latest-filtered/'
+full_dataset_path = base_path + 'ml-latest/ml-latest/'
 small_dataset_path = base_path + 'ml-latest-small/ml-latest-small/'
 
 def imdb_to_movieid(imdb_id_lst, full_dataset=False):
