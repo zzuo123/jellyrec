@@ -2,6 +2,7 @@
 
 async function get_info(imdb_id, omdb_api_key){
     const url = `https://www.omdbapi.com/?i=${imdb_id}&apikey=${omdb_api_key}`;
+    console.log(url);
     const response = await fetch(url);
     if (!response.ok) {
         return null;
@@ -12,7 +13,7 @@ async function get_info(imdb_id, omdb_api_key){
 
 
 async function add_info_omdb(movies, omdb_api_key){
-    for (let i = 0; i < recs.length; i++) {
+    for (let i = 0; i < movies.length; i++) {
         const info = await get_info(movies[i].imdb_id, omdb_api_key);
         if (info === null) {
             continue;
@@ -29,7 +30,8 @@ async function add_info_omdb(movies, omdb_api_key){
         movies[i].runtime = info.Runtime || "N/A";
         movies[i].language = info.Language || "N/A";
     }
-    return recs;
+    // console.log(movies);
+    return movies;
 }
 
 export default {
