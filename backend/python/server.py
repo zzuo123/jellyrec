@@ -109,11 +109,11 @@ if __name__ == '__main__':
         print('n:', n)
         print('full_dataset:', full_dataset)
         if full_dataset_options:
-            imdb, recommended_movies = recommend_movies(fav_movies_imdb, n=n, full_dataset=full_dataset, full_dataset_options=full_dataset_options)
+            imdb = recommend_movies(fav_movies_imdb, n=n, full_dataset=full_dataset, full_dataset_options=full_dataset_options)
         else:
-            imdb, recommended_movies = recommend_movies(fav_movies_imdb, n=n, full_dataset=full_dataset)
-        print('imdb:', imdb)
-        return jsonify({'recommendations': [{'imdbid': imdb, 'title': recommended_movies} for imdb, recommended_movies in zip(imdb, recommended_movies)]})
+            imdb = recommend_movies(fav_movies_imdb, n=n, full_dataset=full_dataset)
+        print('recommended imdb:', imdb)
+        return jsonify({'recommendations': [{'imdb_id': imdbid, 'imdb_url': 'https://www.imdb.com/title/'+imdbid} for imdbid in imdb]})
 
     # run app on localhost port 8888
     from waitress import serve

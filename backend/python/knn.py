@@ -151,10 +151,9 @@ def recommend_movies(fav_movies_imdb, n=10, full_dataset=False, full_dataset_opt
     top_indices = np.argsort(scores)[::-1][:n]
     top_movie_ids = mapping_movie.get_ids(top_indices)
 
-    # convert the top movie ids to imdb ids and titles
+    # convert the top movie ids to imdb ids
     top_imdb_ids = movieid_to_imdb(top_movie_ids, full_dataset)
-    top_titles = movieid_to_title(top_movie_ids, full_dataset)
-    return top_imdb_ids, top_titles
+    return top_imdb_ids
 
 
 

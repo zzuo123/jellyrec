@@ -4,7 +4,6 @@ import morgan from 'morgan';
 import logger from './modules/log/logger.js';
 import auth from './modules/auth/auth.js';
 import scraper from './modules/scraper/scraper.js';
-import output from './modules/output/output.js';
 import rec from './modules/rec/rec.js';
 
 const port = process.env.PORT || 4001;
@@ -129,15 +128,6 @@ app.get('/Movie/GetRecommendation', async (req, res) => {
     logger.info(`POST /Movie/GetRecommendation: recommendation retrieved`);
     res.json(result);
 });
-
-// cache
-    // if(output.cacheUserInfo(userinfo)) {
-    //     logger.info(`POST /Movie/GetRecommendation: user ${userinfo.uid} info cached`);
-    // } else {
-    //     logger.error(`POST /Movie/GetRecommendation: error caching user ${userinfo.uid} info`);
-    //     res.status(401).json({ message: 'Error caching user info' });
-    // }
-
 
 app.listen(port, () => {
     logger.info(`Listening on port ${port}`);
