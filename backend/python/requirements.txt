@@ -1,0 +1,5 @@
+Flask==3.0.3
+Flask-Cors==4.0.1
+pandas==2.2.2
+scikit-learn==1.2.2
+numpy==1.24.3
