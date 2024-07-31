@@ -78,9 +78,23 @@ app.post('/Auth/logout', async (req, res) => {
     res.json({ message: 'ok' });
 });
 
+function env_var_check(var_name){
+    console.log(process.env[var_name]);
+    if (process.env[var_name] === undefined || process.env[var_name] === null || process.env[var_name] === '') {
+        logger.error(`GET /Movie/GetFavorite: ${var_name} not set`);
+        return false;
+    }
+    return true;
+}
+
 function checkLogin(res) {
+    if (env_var_check('JELLYFIN_API_KEY') || env_var_check('JELLYFIN_USER_ID') || env_var_check('JELLYFIN_URL')) {
+        userinfo.token = process.env.JELLYFIN_API_KEY;
+        userinfo.uid = process.env.JELLYFIN_USER_ID;
+        userinfo.baseurl = process.env.JELLYFIN_URL;
+        return true;
+    }   
     if (userinfo.token === null || userinfo.uid === null || userinfo.baseurl === null) {
-        logger.error(`GET /Movie/GetFavorite: user not logged in`);
         res.status(401).json({ message: 'User not logged in' });
         return false; 
     }
@@ -90,6 +104,7 @@ function checkLogin(res) {
 app.get('/Movie/GetFavorite', async (req, res) => {
     logger.info(`GET /Movie/GetFavorite: received request for favorite movies`);
     if (!checkLogin(res)) {
+        logger.error(`GET /Movie/GetFavorite: user not logged in`);
         return;
     }
     if (userinfo.favMovies !== null && userinfo.token !== null) {
@@ -112,6 +127,7 @@ app.get('/Movie/GetFavorite', async (req, res) => {
 app.get('/Show/GetFavorite', async (req, res) => {
     logger.info(`GET /Show/GetFavorite: received request for favorite shows`);
     if (!checkLogin(res)) {
+        logger.error(`GET /Show/GetFavorite: user not logged in`);
         return;
     }
     if (userinfo.favShows !== null) {
@@ -131,103 +147,113 @@ app.get('/Show/GetFavorite', async (req, res) => {
     res.json(result);
 });
 
+function checkFavMovies(res) {
+    if (userinfo.favMovies === null) {
+        logger.error(`GET /Movie/GetFavorite: favorite movies not yet retrieved`);
+        res.status(401).json({ message: 'Favorite movies not yet retrieved' });
+        return false;
+    }
+    return true;
+}
+
 app.get('/Movie/GetRecommendation/:n?', async (req, res) => {
-    // if (!checkLogin(res)) {
-    //     return;
-    // } else if (userinfo.favMovies === null) {
-    //     logger.error(`GET /Movie/GetRecommendation: favorite movies not yet retrieved`);
-    //     res.status(401).json({ message: 'Unable to get recommendation: Favorite movies not yet retrieved' });
-    //     return;
-    // }
-    // let n = req.params.n;
-    // if (n === undefined) {
-    //     n = 10;
-    // }
-    // let result = await rec.get_rec(userinfo.favMovies, n, true);
-    // if (result === null || result === undefined) {
-    //     logger.error(`POST /Movie/GetRecommendation: error getting recommendation`);
-    //     res.status(401).json({ message: 'Error getting recommendation' });
-    //     return;
-    // }
-    // logger.info(`POST /Movie/GetRecommendation: recommendation retrieved`);
-    // result = await info.add_info_omdb(result['recommendations'], process.env.OMDB_API_KEY);
-    const result = [
-  {
-    "imdb_id": "tt0848228",
-    "imdb_url": "https://www.imdb.com/title/tt0848228",
-    "title": "The Avengers",
-    "released": "04 May 2012",
-    "rating": "8.0",
-    "plot": "Earth's mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity.",
-    "genre": "Action, Sci-Fi",
-    "poster_url": "https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg",
-    "director": "Joss Whedon",
-    "actors": "Robert Downey Jr., Chris Evans, Scarlett Johansson",
-    "awards": "Nominated for 1 Oscar. 39 wins & 81 nominations total",
-    "runtime": "143 min",
-    "language": "English, Russian"
-  },
-  {
-    "imdb_id": "tt2015381",
-    "imdb_url": "https://www.imdb.com/title/tt2015381",
-    "title": "Guardians of the Galaxy",
-    "released": "01 Aug 2014",
-    "rating": "8.0",
-    "plot": "A group of intergalactic criminals must pull together to stop a fanatical warrior with plans to purge the universe.",
-    "genre": "Action, Adventure, Comedy",
-    "poster_url": "https://m.media-amazon.com/images/M/MV5BNDIzMTk4NDYtMjg5OS00ZGI0LWJhZDYtMzdmZGY1YWU5ZGNkXkEyXkFqcGdeQXVyMTI5NzUyMTIz._V1_SX300.jpg",
-    "director": "James Gunn",
-    "actors": "Chris Pratt, Vin Diesel, Bradley Cooper",
-    "awards": "Nominated for 2 Oscars. 52 wins & 103 nominations total",
-    "runtime": "121 min",
-    "language": "English"
-  },
-  {
-    "imdb_id": "tt0371746",
-    "imdb_url": "https://www.imdb.com/title/tt0371746",
-    "title": "Iron Man",
-    "released": "02 May 2008",
-    "rating": "7.9",
-    "plot": "After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.",
-    "genre": "Action, Adventure, Sci-Fi",
-    "poster_url": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_SX300.jpg",
-    "director": "Jon Favreau",
-    "actors": "Robert Downey Jr., Gwyneth Paltrow, Terrence Howard",
-    "awards": "Nominated for 2 Oscars. 24 wins & 73 nominations total",
-    "runtime": "126 min",
-    "language": "English, Persian, Urdu, Arabic, Kurdish, Hindi, Hungarian"
-  },
-  {
-    "imdb_id": "tt1375666",
-    "imdb_url": "https://www.imdb.com/title/tt1375666",
-    "title": "Inception",
-    "released": "16 Jul 2010",
-    "rating": "8.8",
-    "plot": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.",
-    "genre": "Action, Adventure, Sci-Fi",
-    "poster_url": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    "director": "Christopher Nolan",
-    "actors": "Leonardo DiCaprio, Joseph Gordon-Levitt, Elliot Page",
-    "awards": "Won 4 Oscars. 159 wins & 220 nominations total",
-    "runtime": "148 min",
-    "language": "English, Japanese, French"
-  },
-  {
-    "imdb_id": "tt1431045",
-    "imdb_url": "https://www.imdb.com/title/tt1431045",
-    "title": "Deadpool",
-    "released": "12 Feb 2016",
-    "rating": "8.0",
-    "plot": "A wisecracking mercenary gets experimented on and becomes immortal yet hideously scarred, and sets out to track down the man who ruined his looks.",
-    "genre": "Action, Comedy",
-    "poster_url": "https://m.media-amazon.com/images/M/MV5BYzE5MjY1ZDgtMTkyNC00MTMyLThhMjAtZGI5OTE1NzFlZGJjXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-    "director": "Tim Miller",
-    "actors": "Ryan Reynolds, Morena Baccarin, T.J. Miller",
-    "awards": "29 wins & 78 nominations",
-    "runtime": "108 min",
-    "language": "English"
-  }
-];
+    if (!checkLogin(res) || !checkFavMovies(res)) {
+        logger.error(`GET /Movie/GetRecommendation: user not logged in or favorite movies not yet retrieved`);
+        return;
+    } else if (userinfo.favMovies === null) {
+        logger.error(`GET /Movie/GetRecommendation: favorite movies not yet retrieved`);
+        res.status(401).json({ message: 'Unable to get recommendation: Favorite movies not yet retrieved' });
+        return;
+    }
+    let n = req.params.n;
+    if (n === undefined) {
+        n = 10;
+    }
+    let result = await rec.get_rec(userinfo.favMovies, n, true);
+    if (result === null || result === undefined) {
+        logger.error(`POST /Movie/GetRecommendation: error getting recommendation`);
+        res.status(401).json({ message: 'Error getting recommendation' });
+        return;
+    }
+    logger.info(`POST /Movie/GetRecommendation: recommendation retrieved`);
+    result = await info.add_info_omdb(result['recommendations'], process.env.OMDB_API_KEY);
+//     const result = [
+//   {
+//     "imdb_id": "tt0848228",
+//     "imdb_url": "https://www.imdb.com/title/tt0848228",
+//     "title": "The Avengers",
+//     "released": "04 May 2012",
+//     "rating": "8.0",
+//     "plot": "Earth's mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity.",
+//     "genre": "Action, Sci-Fi",
+//     "poster_url": "https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg",
+//     "director": "Joss Whedon",
+//     "actors": "Robert Downey Jr., Chris Evans, Scarlett Johansson",
+//     "awards": "Nominated for 1 Oscar. 39 wins & 81 nominations total",
+//     "runtime": "143 min",
+//     "language": "English, Russian"
+//   },
+//   {
+//     "imdb_id": "tt2015381",
+//     "imdb_url": "https://www.imdb.com/title/tt2015381",
+//     "title": "Guardians of the Galaxy",
+//     "released": "01 Aug 2014",
+//     "rating": "8.0",
+//     "plot": "A group of intergalactic criminals must pull together to stop a fanatical warrior with plans to purge the universe.",
+//     "genre": "Action, Adventure, Comedy",
+//     "poster_url": "https://m.media-amazon.com/images/M/MV5BNDIzMTk4NDYtMjg5OS00ZGI0LWJhZDYtMzdmZGY1YWU5ZGNkXkEyXkFqcGdeQXVyMTI5NzUyMTIz._V1_SX300.jpg",
+//     "director": "James Gunn",
+//     "actors": "Chris Pratt, Vin Diesel, Bradley Cooper",
+//     "awards": "Nominated for 2 Oscars. 52 wins & 103 nominations total",
+//     "runtime": "121 min",
+//     "language": "English"
+//   },
+//   {
+//     "imdb_id": "tt0371746",
+//     "imdb_url": "https://www.imdb.com/title/tt0371746",
+//     "title": "Iron Man",
+//     "released": "02 May 2008",
+//     "rating": "7.9",
+//     "plot": "After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.",
+//     "genre": "Action, Adventure, Sci-Fi",
+//     "poster_url": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_SX300.jpg",
+//     "director": "Jon Favreau",
+//     "actors": "Robert Downey Jr., Gwyneth Paltrow, Terrence Howard",
+//     "awards": "Nominated for 2 Oscars. 24 wins & 73 nominations total",
+//     "runtime": "126 min",
+//     "language": "English, Persian, Urdu, Arabic, Kurdish, Hindi, Hungarian"
+//   },
+//   {
+//     "imdb_id": "tt1375666",
+//     "imdb_url": "https://www.imdb.com/title/tt1375666",
+//     "title": "Inception",
+//     "released": "16 Jul 2010",
+//     "rating": "8.8",
+//     "plot": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.",
+//     "genre": "Action, Adventure, Sci-Fi",
+//     "poster_url": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
+//     "director": "Christopher Nolan",
+//     "actors": "Leonardo DiCaprio, Joseph Gordon-Levitt, Elliot Page",
+//     "awards": "Won 4 Oscars. 159 wins & 220 nominations total",
+//     "runtime": "148 min",
+//     "language": "English, Japanese, French"
+//   },
+//   {
+//     "imdb_id": "tt1431045",
+//     "imdb_url": "https://www.imdb.com/title/tt1431045",
+//     "title": "Deadpool",
+//     "released": "12 Feb 2016",
+//     "rating": "8.0",
+//     "plot": "A wisecracking mercenary gets experimented on and becomes immortal yet hideously scarred, and sets out to track down the man who ruined his looks.",
+//     "genre": "Action, Comedy",
+//     "poster_url": "https://m.media-amazon.com/images/M/MV5BYzE5MjY1ZDgtMTkyNC00MTMyLThhMjAtZGI5OTE1NzFlZGJjXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
+//     "director": "Tim Miller",
+//     "actors": "Ryan Reynolds, Morena Baccarin, T.J. Miller",
+//     "awards": "29 wins & 78 nominations",
+//     "runtime": "108 min",
+//     "language": "English"
+//   }
+// ];
     res.json(result);
 });
 
