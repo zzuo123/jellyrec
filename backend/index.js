@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import dotenv from 'dotenv';
 import logger from './modules/log/logger.js';
 import auth from './modules/auth/auth.js';
 import scraper from './modules/scraper/scraper.js';
@@ -13,6 +14,8 @@ const app = express();
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+dotenv.config();
 
 let userinfo = {
     baseurl: null,
@@ -36,7 +39,13 @@ app.post('/Auth/login', async (req, res) => {
     clearUserInfo();
     userinfo.baseurl = url;
     logger.info(`POST /login: received login request for ${username}`);
-    const result = await auth.authenticate(url, username, password);
+    let result = null;
+    console.log("API: "+process.env.JELLYFIN_API_KEY);
+    if (process.env.JELLYFIN_API_KEY !== undefined && process.env.JELLYFIN_API_KEY !== null && process.env.JELLYFIN_API_KEY !== '') {
+        result = await auth.auth_using_api_key(url, process.env.JELLYFIN_API_KEY, username);
+    } else {
+        result = await auth.authenticate(url, username, password);
+    }
     if (result === null || result === undefined) {
         logger.error(`POST /login: user ${username} not authenticated`);
         res.status(401).json({ message: 'Invalid url or username or password... Please retry.' });

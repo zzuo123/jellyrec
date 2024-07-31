@@ -8,3 +8,4 @@ downloads/
 __pycache__/
 ml-latest/
 ml-latest-filtered/
+.env

@@ -31,7 +31,30 @@ async function logout(baseurl, token){
     return true;
 }
 
+async function auth_using_api_key(baseurl, api_key, name){
+    // authenticate user using api key, returns access token and user id
+    const response = await fetch(baseurl+"/Users", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": 'MediaBrowser Client="JellyRec", Device="JellyRecBackend", DeviceId="JellyRecBackend", Version="1.0.0", Token="'+api_key+'"'
+        }
+    });
+    if (!response.ok) {
+        return null;
+    }
+    const result = await response.json();
+    for (let i = 0; i < result.length; i++) {
+        if (result[i].Name === name) {
+            return { token: api_key, uid: result[i].Id };
+        }
+    }
+    return null;
+}
+
+
 export default {
     authenticate,
-    logout
+    logout,
+    auth_using_api_key
 }
