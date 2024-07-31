@@ -43,6 +43,11 @@ def get_user_item_matrix(full_dataset=False, full_dataset_options=None):
     
     # create the user-item matrix and fill missing values with 0
     user_item_matrix = ratings.pivot(index='userId', columns='movieId', values='rating')
+
+    # center the ratings by subtracting 2.5 from each rating so that the ratings are between -2.5 and 2.5
+    user_item_matrix = user_item_matrix - 2.5   # required for cosine similarity
+    
+    # fill missing values with 0
     user_item_matrix = user_item_matrix.fillna(0)
 
     # pickle the user-item matrix
@@ -141,7 +146,7 @@ def recommend_movies(fav_movies_imdb, n=10, full_dataset=False, full_dataset_opt
 
     # construct the user-interaction vector using fav_indices
     user_interaction = np.zeros(len(mapping_movie.ids))
-    user_interaction[fav_indices] = 5
+    user_interaction[fav_indices] = 2.5
 
     # calculate the scores for each movie based on the cosine similarity model and set favorite movies score to 0 (don't recommend the same movies)
     scores = cosine_sim_model.dot(user_interaction)
