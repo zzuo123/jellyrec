@@ -22,19 +22,18 @@ To get the Jellyfin API key, you would need to be an admin on your Jellyfin serv
 
 The Jellyfin URL is the url to your Jellyfin server. For example, if you are running Jellyfin on your local machine, the url would be `http://localhost:<port>`. If you are running Jellyfin on a server, the url would be `http://your-server-ip:<port?>`.
 
-## To run the backend (Python Recommendation Engine):
+## To install all dependencies (Python and NodeJS):
 
 ```bash
-cd backend/python
+cd backend/
+npm install
+cd python/
 pip install -r requirements.txt
-python server.py
 ```
 
 ## To run the backend (Express JS API):
 
 ```bash
-cd backend/
-npm install
 npm start
 ```
 
