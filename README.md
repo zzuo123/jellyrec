@@ -9,7 +9,8 @@ First create a `.env` file in the backend/ directory with the following content:
 ```
 OMDB_API_KEY=<OMDB API Key (optional: for retrieving information on recommended movies)>
 JELLYFIN_API_KEY=<Your Jellyfin API Key>
-JELLYFIN_USER_ID=<Your Jellyfin User ID>
+JELLYFIN_USERNAME=<Your Jellyfin USERNAME>
+JELLYFIN_PASSWORD=<Your Jellyfin PASSWORD>
 JELLYFIN_URL=<The url to your jellyfin server (possible with port if not 80 or 443)>
 ```
 
@@ -18,8 +19,6 @@ Some notes on obtaining the required environment variables:
 To get the OMDB API key, you would need to register for an account at [http://www.omdbapi.com/apikey.aspx](http://www.omdbapi.com/apikey.aspx).
 
 To get the Jellyfin API key, you would need to be an admin on your Jellyfin server. From the hamburger menu, go to `Administration` -> `Dashboard` -> `API Keys` and press the `+` button to create a new API key.
-
-To get the Jellyfin User ID, you can go to `Settings` -> `Profile` and your user id should be at the end of the url. For example, if the url is `http://localhost:8096/web/#/userprofile.html?userId=abcdefg`, then the user id is `abcdefg`.
 
 The Jellyfin URL is the url to your Jellyfin server. For example, if you are running Jellyfin on your local machine, the url would be `http://localhost:<port>`. If you are running Jellyfin on a server, the url would be `http://your-server-ip:<port?>`.
 
@@ -62,8 +61,6 @@ Result:
 ```json
 {
   "message": "ok",
-  "token": "jf access token",
-  "uid": "jf user id"
 }
 ```
 
