@@ -16,8 +16,8 @@ function extractFields(result, baseurl) {
         return {
             id: item.Id,
             name: item.Name,
-            imdbid: item.ProviderIds.Imdb,
-            imageurl: generateImageUrl(baseurl, item.Id, item.ImageTags.Primary)
+            imdb_id: item.ProviderIds.Imdb,
+            jf_image_url: generateImageUrl(baseurl, item.Id, item.ImageTags.Primary)
         }
     });
 }
