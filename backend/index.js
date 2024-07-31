@@ -115,11 +115,15 @@ app.get('/Show/GetFavorite', async (req, res) => {
     res.json(result);
 });
 
-app.get('/Movie/GetRecommendation', async (req, res) => {
+app.get('/Movie/GetRecommendation/:n?', async (req, res) => {
     if (!checkLogin(res)) {
         return;
     }
-    const result = await rec.get_rec(userinfo.favMovies);
+    let n = req.params.n;
+    if (n === undefined) {
+        n = 10;
+    }
+    const result = await rec.get_rec(userinfo.favMovies, n, true);
     if (result === null || result === undefined) {
         logger.error(`POST /Movie/GetRecommendation: error getting recommendation`);
         res.status(401).json({ message: 'Error getting recommendation' });

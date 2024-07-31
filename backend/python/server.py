@@ -98,7 +98,7 @@ if __name__ == '__main__':
     def recommend():
         data = request.json
         fav_movies_imdb = data['fav_movies_imdb']
-        n = data['n']
+        n = int(data['n'])
         full_dataset = data['full_dataset']
         full_dataset_options = None
         if full_dataset and 'full_dataset_options' in data:
