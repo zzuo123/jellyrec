@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import spawn from 'child_process';
 import logger from './modules/log/logger.js';
 import auth from './modules/auth/auth.js';
 import scraper from './modules/scraper/scraper.js';
 import output from './modules/output/output.js';
+import rec from './modules/rec/rec.js';
 
 const port = process.env.PORT || 4001;
 
@@ -116,40 +116,27 @@ app.get('/Show/GetFavorite', async (req, res) => {
     res.json(result);
 });
 
-app.post('/Movie/GetRecommendation', async (req, res) => {
+app.get('/Movie/GetRecommendation', async (req, res) => {
     if (!checkLogin(res)) {
         return;
     }
-    if(output.cacheUserInfo(userinfo)) {
-        logger.info(`POST /Movie/GetRecommendation: user ${userinfo.uid} info cached`);
-        res.json({ message: 'ok' });
-    } else {
-        logger.error(`POST /Movie/GetRecommendation: error caching user ${userinfo.uid} info`);
-        res.status(401).json({ message: 'Error caching user info' });
+    const result = await rec.get_rec(userinfo.favMovies);
+    if (result === null || result === undefined) {
+        logger.error(`POST /Movie/GetRecommendation: error getting recommendation`);
+        res.status(401).json({ message: 'Error getting recommendation' });
+        return;
     }
+    logger.info(`POST /Movie/GetRecommendation: recommendation retrieved`);
+    res.json(result);
 });
 
-app.post('/Run/Python', (req, res) => {
-    // if (!checkLogin(res)) {
-    //     return;
+// cache
+    // if(output.cacheUserInfo(userinfo)) {
+    //     logger.info(`POST /Movie/GetRecommendation: user ${userinfo.uid} info cached`);
+    // } else {
+    //     logger.error(`POST /Movie/GetRecommendation: error caching user ${userinfo.uid} info`);
+    //     res.status(401).json({ message: 'Error caching user info' });
     // }
-    const pythonProcess = spawn.spawn('python', ['./modules/generate/generate.py', '93f7ef9c38c946829b359d4f5c523eee', 'arg2']);
-    
-    pythonProcess.stdout.on('data', (data) => {
-        let result = JSON.parse(data.toString());
-        res.json(result);
-        // console.log(`stdout: ${data}`);
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
-
-    pythonProcess.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
-
-});
 
 
 app.listen(port, () => {
