@@ -118,6 +118,10 @@ app.get('/Show/GetFavorite', async (req, res) => {
 app.get('/Movie/GetRecommendation/:n?', async (req, res) => {
     if (!checkLogin(res)) {
         return;
+    } else if (userinfo.favMovies === null) {
+        logger.error(`GET /Movie/GetRecommendation: favorite movies not yet retrieved`);
+        res.status(401).json({ message: 'Unable to get recommendation: Favorite movies not yet retrieved' });
+        return;
     }
     let n = req.params.n;
     if (n === undefined) {
