@@ -60,6 +60,8 @@
     <p class="prompt">Login Using Jellyfin Credential</p>
     <form id="login-form">
         <hr>
+        <label class="label" for="url">Server Url</label>
+        <input id="url" type="text" placeholder="Jellyfin Server Url">
         <label class="label" for="uname">Username</label>
         <input id="uname" type="text" placeholder="Username">
         <label class="label" for="pw">Password</label>
