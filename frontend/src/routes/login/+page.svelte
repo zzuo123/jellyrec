@@ -30,12 +30,11 @@
         #title{
             color: #fff;
             text-align: center;
-            font-size: 3em;
+            font-size: 5em;
             background: linear-gradient(135deg, #610699, #1CA1D8);
             -webkit-background-clip: text;
             color: transparent;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
         #short-desc{
             color: #fff;
