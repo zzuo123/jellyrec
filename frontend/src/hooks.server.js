@@ -22,9 +22,12 @@ export const handle = async ({ event, resolve}) => {
   const url = new URL(event.request.url);
 
   if (url.pathname == "/") {
-    if (user != "null") {
+    console.log("hook: attempted to access /");
+    if (user != null && user != "null") {
+      console.log("hook: redirecting to home");
       throw redirect(302, '/home');
     } else {
+      console.log("hook: redirecting to login");
       throw redirect(302, '/login');
     }
   }
@@ -35,7 +38,7 @@ export const handle = async ({ event, resolve}) => {
     throw redirect(302, '/');
   }
 
-  if(user != "null"){
+  if(user != null && user != "null"){
     console.log("hook: user cookie not null");
     event.locals.user = user;
 
