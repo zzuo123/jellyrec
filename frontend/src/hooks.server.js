@@ -21,6 +21,14 @@ export const handle = async ({ event, resolve}) => {
   }
   const url = new URL(event.request.url);
 
+  if (url.pathname == "/") {
+    if (user != "null") {
+      throw redirect(302, '/home');
+    } else {
+      throw redirect(302, '/login');
+    }
+  }
+
   // validate the user existence and if the path is acceesible
   if (user == "null" && !isPathAllowed(url.pathname)) {
     console.log("hook: user cookie null and trying to access a private path");
