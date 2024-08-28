@@ -1,0 +1,1 @@
+<h1>Logging you out (you shouldn't have to see this)</h1>

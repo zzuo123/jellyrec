@@ -1,5 +1,3 @@
-<!-- half transparent login pane centered mobile optimized with separate css style tag -->
-
 <style>
     .login {
         background: rgba(217, 217, 217, 0.5);
@@ -58,14 +56,14 @@
 
 <div class="login">
     <p class="prompt">Login Using Jellyfin Credential</p>
-    <form id="login-form">
+    <form method="POST" id="login-form">
         <hr>
         <label class="label" for="url">Server Url</label>
-        <input id="url" type="text" placeholder="Jellyfin Server Url">
-        <label class="label" for="uname">Username</label>
-        <input id="uname" type="text" placeholder="Username">
+        <input id="url" name="url" type="text" placeholder="Jellyfin Server Url">
+        <label class="label" for="name">Username</label>
+        <input id="name" name="name" type="text" placeholder="Username">
         <label class="label" for="pw">Password</label>
-        <input id="pw" type="password" placeholder="Password">
+        <input id="pw" name="pw" type="password" placeholder="Password">
         <hr>
         <input id="submit" type="submit" value="Login">
     </form>
