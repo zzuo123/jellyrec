@@ -106,7 +106,9 @@ app.get('/Movie/GetFavorite', async (req, res) => {
     }
     logger.info(`GET /Movie/GetFavorite: favorite movies retrieved`);
     userinfo.favMovies = result;
-    res.json(result);
+    const user_result = await info.add_info_omdb(result, process.env.OMDB_API_KEY);
+    logger.info(`GET /Movie/GetFavorite: info retrieved from OMDB`);
+    res.json(user_result);
 });
 
 app.get('/Show/GetFavorite', async (req, res) => {
