@@ -50,7 +50,7 @@
       font-size: 5em;
       background: linear-gradient(135deg, #610699, #1ca1d8);
       -webkit-background-clip: text;
-      background-clip: text; /* Add the standard property */
+      background-clip: text;
       color: transparent;
       margin-bottom: 10px;
   }
