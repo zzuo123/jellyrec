@@ -14,10 +14,10 @@ function generateImageUrl(baseurl, itemid, tag) {
 function extractFields(result, baseurl) {
     return result["Items"].map(item => {
         return {
-            id: item.Id,
-            name: item.Name,
+            // id: item.Id,
+            // name: item.Name,
             imdb_id: item.ProviderIds.Imdb,
-            jf_image_url: generateImageUrl(baseurl, item.Id, item.ImageTags.Primary)
+            // jf_image_url: generateImageUrl(baseurl, item.Id, item.ImageTags.Primary)
         }
     });
 }
