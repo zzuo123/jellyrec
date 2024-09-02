@@ -1,5 +1,5 @@
 <script>
-  import cog from '$lib/assets/cog.svg';
+  import logout from '$lib/assets/logout.svg';
 </script>
 
 <nav>
@@ -7,7 +7,7 @@
   <form action="/logout" method="post">
     <button>
       Logout
-      <img id="cog" src={cog} alt="cog" />
+      <img id="logout" src={logout} alt="logout icon" />
     </button>
   </form>
 </nav>
@@ -42,8 +42,9 @@
     background-clip: text;
     color: transparent;
   }
-  #cog {
+  #logout {
     width: 1em;
     height: 1em;
+    vertical-align: middle;
   }
 </style>
