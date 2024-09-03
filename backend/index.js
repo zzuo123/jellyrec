@@ -50,6 +50,13 @@ function ensure_login(res, route) {
     return true;
 }
 
+app.get('/Auth/loggedin', async (req, res) => {
+    if (checkLogin()) {
+        res.json({ message: 'ok' });
+    } else {
+        res.status(401).json({ message: 'User not logged in' });
+    }
+});
 
 app.post('/Auth/login', async (req, res) => {
     logger.info(`POST /login: received login request.`);
