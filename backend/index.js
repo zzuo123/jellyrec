@@ -128,8 +128,8 @@ app.get('/Show/GetFavorite', async (req, res) => {
 app.get('/Movie/GetRecommendation/:n?', async (req, res) => {
     if (!ensure_login(res, '/Movie/GetRecommendation')) { return; }
     if (userinfo.favMovies === null || userinfo.favMovies === undefined || userinfo.favMovies.length === 0) {
-        logger.error(`GET /Movie/GetRecommendation: user has no favorite movies`);
-        res.status(401).json({ message: 'User has no favorite movies' });
+        logger.error(`GET /Movie/GetRecommendation: user has no favorite movies or favorite movies not retrieved`);
+        res.status(401).json({ message: 'User has no favorite movies or favorite movies not retrieved' });
         return;
     }
     const n = req.params.n || 10;   // default to 10 recommendations
