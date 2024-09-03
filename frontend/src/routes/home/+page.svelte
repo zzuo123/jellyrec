@@ -1,6 +1,7 @@
 <script>
   import Navbar from "../Navbar.svelte";
   import Favorites from "./Favorites.svelte";
+  import Recs from "./Recs.svelte";
 </script>
 
 <head>
@@ -11,6 +12,7 @@
 
 <div class="content">
   <Favorites />
+  <Recs />
 </div>
 
 <style>
