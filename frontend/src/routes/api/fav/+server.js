@@ -11,7 +11,8 @@ export async function GET() {
         result = await result.json();
         return json({ success: true, data: result });
     } else {
-        return json({ success: false });
+        result = await result.json();
+        return json({ success: false, message: result.message});
     }
 }
 
