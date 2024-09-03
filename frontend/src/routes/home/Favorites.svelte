@@ -33,10 +33,13 @@
     <p>No favorite movies found.</p>
   {/if}
 {:else}
+<div class="error-msg">
   <p>
     Something went wrong when fetching favorite movies, please try to logout and
     login again.
   </p>
+  <p>Error message from server: {favMovies.message}</p>
+</div>
 {/if}
 
 <!-- <img src={refresh} alt="refresh" /> -->
@@ -74,5 +77,8 @@
     display: flex;
     flex-direction: row;
     overflow-y: scroll;
+  }
+  .error-msg {
+    color: red;
   }
 </style>
