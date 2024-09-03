@@ -13,17 +13,42 @@ function isPathAllowed(path) {
   );
 }
 
+async function checkLogin() {
+  let result = await fetch("http://localhost:4001/Auth/loggedin", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (result.ok) {
+    result = await result.json();
+    return result.username;
+  } else {
+    return null;
+  }
+}
+
 export const handle = async ({ event, resolve}) => {
+
+  // check if the user is logged in
+  let loggedin = false;
   let user = null;
   // check if the cookie exist, and if exists, parse it to the user variable
   if(event.cookies.get('user') != undefined && event.cookies.get('user') != null){
     user = event.cookies.get('user');
   }
+  let server_username = await checkLogin();
+  if(server_username != null && server_username == user){
+    loggedin = true;
+  }
+  event.locals.user = loggedin;
+  event.locals.user = user;
+
   const url = new URL(event.request.url);
 
   if (url.pathname == "/") {
     console.log("hook: attempted to access /");
-    if (user != null && user != "null") {
+    if (loggedin && user != "null") {
       console.log("hook: redirecting to home");
       throw redirect(302, '/home');
     } else {
@@ -33,13 +58,13 @@ export const handle = async ({ event, resolve}) => {
   }
 
   // validate the user existence and if the path is acceesible
-  if (user == "null" && !isPathAllowed(url.pathname)) {
-    console.log("hook: user cookie null and trying to access a private path");
+  if (!loggedin && !isPathAllowed(url.pathname)) {
+    console.log("hook: user not logged in but trying to access a private path");
     throw redirect(302, '/');
   }
 
-  if(user != null && user != "null"){
-    console.log("hook: user cookie not null");
+  if(loggedin){
+    console.log("hook: user logged in");
     event.locals.user = user;
 
     if(url.pathname == '/login'){

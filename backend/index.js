@@ -22,6 +22,7 @@ let userinfo = {
     baseurl: null,
     token: null,
     uid: null,
+    username: null,
     favMovies: null,
     favShows: null
 };
@@ -30,6 +31,7 @@ function clearUserInfo() {
     userinfo.baseurl = null;
     userinfo.token = null;
     userinfo.uid = null;
+    userinfo.username = null;
     userinfo.favMovies = null;
     userinfo.favShows = null;
 }
@@ -52,9 +54,9 @@ function ensure_login(res, route) {
 
 app.get('/Auth/loggedin', async (req, res) => {
     if (checkLogin()) {
-        res.json({ message: 'ok' });
+        res.json({ message: 'ok', username: userinfo.username });
     } else {
-        res.status(401).json({ message: 'User not logged in' });
+        res.status(401).json({ message: 'User not logged in', username: null });
     }
 });
 
@@ -66,21 +68,21 @@ app.post('/Auth/login', async (req, res) => {
         return;
     }
     clearUserInfo();
-    const username = req.body.username || process.env.JELLYFIN_USERNAME || null;
     const password = req.body.password || process.env.JELLYFIN_PASSWORD || null;
+    userinfo.username = req.body.username || process.env.JELLYFIN_USERNAME || null;
     userinfo.token = req.body.token || process.env.JELLYFIN_API_KEY || null;
     userinfo.baseurl = req.body.url || process.env.JELLYFIN_URL || null;
     userinfo.uid = req.body.uid || process.env.JELLYFIN_UID || null;
     // these big three are required to connect to the jellyfin server
     if (userinfo.token === null || userinfo.baseurl === null || userinfo.uid === null) {  
-        const result = await auth.authenticate(userinfo.baseurl, username, password);
+        const result = await auth.authenticate(userinfo.baseurl, userinfo.username, password);
         if (result === null || result === undefined) {
             clearUserInfo();
-            logger.error(`POST /login: error authenticating user ${username}, invalid url or username or password or token`);
+            logger.error(`POST /login: error authenticating user ${userinfo.username}, invalid url or username or password or token`);
             res.status(401).json({ message: 'Invalid url or username or password... Please retry.' });
             return;
         }
-        logger.info(`POST /login: user ${username} authenticated`);
+        logger.info(`POST /login: user ${userinfo.username} authenticated`);
         userinfo.token = result.token;
         userinfo.uid = result.uid;
     }
