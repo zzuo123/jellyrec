@@ -88,7 +88,7 @@ export const actions = {
         status: 400,
         body: {
           success: false,
-          errors,
+          message: "Invalid username or password",
         },
       };
     }
