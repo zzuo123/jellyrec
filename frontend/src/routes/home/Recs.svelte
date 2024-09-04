@@ -35,8 +35,7 @@
 {:else}
   <div class="error-msg">
     <p>
-      Something went wrong when fetching favorite movies, please try to logout and
-      login again.
+      Something went wrong when generating recommendations, possible because there is no favorited movies in Jellyfin or favorite movies not loaded yet.
     </p>
     <p>Error message from server: {favMovies.message}</p>
   </div>
