@@ -1,6 +1,7 @@
 <script>
   import arrow from "$lib/assets/arrow-right-circle.svg";
   import refresh from "$lib/assets/refresh.svg";
+  import { onMount } from "svelte";
   import MovieCard from "./MovieCard.svelte";
 
   let favMovies = { success: true, data: [] };
@@ -9,6 +10,8 @@
     const response = await fetch("/api/fav");
     favMovies = await response.json();
   }
+
+  onMount(getFav);
 </script>
 
 <div class="btn-bar">
@@ -42,7 +45,6 @@
 </div>
 {/if}
 
-<!-- <img src={refresh} alt="refresh" /> -->
 
 <style>
   .btn-bar {
