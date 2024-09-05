@@ -53,7 +53,7 @@
     align-items: center;
     color: #d9d9d9;
     width: 100%;
-    margin-top: 4em;
+    margin: 4em 0 2em 0;
   }
   a {
     text-decoration: none;

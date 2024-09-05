@@ -1,6 +1,7 @@
 <script>
   import arrow from "$lib/assets/arrow-right-circle.svg";
   import refresh from "$lib/assets/refresh.svg";
+    import {onMount} from "svelte";
   import MovieCard from "./MovieCard.svelte";
 
   let favMovies = { success: true, data: [] };
@@ -9,6 +10,8 @@
     const response = await fetch("/api/rec");
     favMovies = await response.json();
   }
+
+  onMount(getRec);
 </script>
 
 <div class="btn-bar">
@@ -50,7 +53,7 @@
     align-items: center;
     color: #d9d9d9;
     width: 100%;
-    margin-top: 4em;
+    margin: 4em 0 2em 0;
   }
   a {
     text-decoration: none;

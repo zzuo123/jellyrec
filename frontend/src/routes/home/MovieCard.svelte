@@ -27,6 +27,7 @@
         color: inherit;
         text-decoration: inherit;
         font: inherit;
+        max-width: 12em;
     }
     .card:hover {
         cursor: pointer;
