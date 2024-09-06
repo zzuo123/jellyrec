@@ -1,8 +1,8 @@
 <script>
   import arrow from "$lib/assets/arrow-right-circle.svg";
   import refresh from "$lib/assets/refresh.svg";
-    import {onMount} from "svelte";
   import MovieCard from "./MovieCard.svelte";
+  import { favFetched } from "../../lib/store/store.js";
 
   let favMovies = { success: true, data: [] };
 
@@ -11,7 +11,13 @@
     favMovies = await response.json();
   }
 
-  onMount(getRec);
+  let ready = false;
+  favFetched.subscribe(async (value) => {
+    ready = value;
+    if (ready) {
+        await getRec();
+    }
+  });
 </script>
 
 <div class="btn-bar">

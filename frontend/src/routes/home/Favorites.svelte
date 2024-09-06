@@ -3,12 +3,16 @@
   import refresh from "$lib/assets/refresh.svg";
   import { onMount } from "svelte";
   import MovieCard from "./MovieCard.svelte";
+  import { favFetched } from "../../lib/store/store.js";
 
   let favMovies = { success: true, data: [] };
 
   async function getFav() {
     const response = await fetch("/api/fav");
     favMovies = await response.json();
+    if (favMovies.success == true) {
+        favFetched.set(true);
+    }
   }
 
   onMount(getFav);
