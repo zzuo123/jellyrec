@@ -4,13 +4,13 @@
   import MovieCard from "./MovieCard.svelte";
   import { favFetched} from "../../lib/store/store.js";
 
-  let favMovies = { success: true, data: [] };
+  let recMovies = { success: true, data: [] };
 
   let numRec = 10;
 
   async function getRec() {
     const response = await fetch("/api/rec?count=" + numRec);
-    favMovies = await response.json();
+    recMovies = await response.json();
     numRec += 10;
   }
 
@@ -34,10 +34,10 @@
   </a>
 </div>
 
-{#if favMovies.success}
-  {#if favMovies.data.length > 0}
+{#if recMovies.success}
+  {#if recMovies.data.length > 0}
     <div class="scrollable">
-      {#each favMovies.data as data}
+      {#each recMovies.data as data}
         <MovieCard data={data} />
       {/each}
     </div>
@@ -49,11 +49,9 @@
     <p>
       Something went wrong when generating recommendations, possible because there is no favorited movies in Jellyfin or favorite movies not loaded yet.
     </p>
-    <p>Error message from server: {favMovies.message}</p>
+    <p>Error message from server: {recMovies.message}</p>
   </div>
 {/if}
-
-<!-- <img src={refresh} alt="refresh" /> -->
 
 <style>
   .btn-bar {

@@ -1,1 +1,1 @@
-<h1>Logging you out (you shouldn't have to see this)</h1>
+<h1>Logging you out (you shouldn't see this, if you do something went wrong with Sveltekit)</h1>
