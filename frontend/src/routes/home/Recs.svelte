@@ -15,6 +15,7 @@
   }
 
   let ready = false;
+
   favFetched.subscribe(async (value) => {
     ready = value;
     if (ready) {

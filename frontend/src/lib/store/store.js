@@ -5,8 +5,11 @@ const favFetched = writable(false);
 
 const numRec = writable(10);
 
+const favoriteMovies = writable(null);
+
 export {
     favFetched,
     numRec,
+    favoriteMovies,
 }
 

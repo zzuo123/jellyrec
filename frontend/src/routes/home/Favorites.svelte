@@ -3,17 +3,28 @@
   import refresh from "$lib/assets/refresh.svg";
   import { onMount } from "svelte";
   import MovieCard from "./MovieCard.svelte";
-  import { favFetched, numRec } from "../../lib/store/store.js";
+  import { favFetched, numRec, favoriteMovies } from "../../lib/store/store.js";
+  import { get } from "svelte/store";
 
   let favMovies = { success: true, data: [] };
 
-  async function getFav() {
+  async function updateFav() {
     const response = await fetch("/api/fav");
     favMovies = await response.json();
+    favoriteMovies.set(favMovies);
     if (favMovies.success == true) {
       numRec.set(10);
       favFetched.set(false);
       favFetched.set(true);
+    }
+  }
+
+  async function getFav() {
+    let favs = get(favoriteMovies);
+    if (favs == null) {
+      await updateFav();
+    } else {
+      favMovies = favs;
     }
   }
 
@@ -25,7 +36,7 @@
     Favorite Movies
     <img class="btn" src={arrow} alt="arrow" />
   </a>
-  <a href="#" class="right-btn" on:click={getFav}>
+  <a href="#" class="right-btn" on:click={updateFav}>
     Refresh
     <img class="btn" src={refresh} alt="refresh" />
   </a>
