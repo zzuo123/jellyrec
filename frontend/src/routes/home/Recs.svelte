@@ -24,7 +24,7 @@
 </script>
 
 <div class="btn-bar">
-  <a href="#" class="left-btn">
+  <a href="/recommendations" class="left-btn">
     Recommendations
     <img class="btn" src={arrow} alt="arrow" />
   </a>

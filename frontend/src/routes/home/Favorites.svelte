@@ -21,7 +21,7 @@
 </script>
 
 <div class="btn-bar">
-  <a href="#" class="left-btn">
+  <a href="/favorites" class="left-btn">
     Favorite Movies
     <img class="btn" src={arrow} alt="arrow" />
   </a>
