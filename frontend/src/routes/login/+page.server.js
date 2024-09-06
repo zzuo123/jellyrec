@@ -1,4 +1,3 @@
-import { user } from "$lib/stores/user.js";
 import { redirect } from "@sveltejs/kit";
 
 async function login(url, name, pw) {
@@ -77,10 +76,6 @@ export const actions = {
         sameSite: "strict",
         maxAge: 60 * 60 * 24 * 1, // 1 day
       });
-      let obj = {
-        name: name,
-      };
-      user.set(obj);
       throw redirect(302, "/home");
     } else {
       console.log("login: response not ok");
