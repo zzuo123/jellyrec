@@ -2,13 +2,16 @@
   import arrow from "$lib/assets/arrow-right-circle.svg";
   import refresh from "$lib/assets/refresh.svg";
   import MovieCard from "./MovieCard.svelte";
-  import { favFetched } from "../../lib/store/store.js";
+  import { favFetched} from "../../lib/store/store.js";
 
   let favMovies = { success: true, data: [] };
 
+  let numRec = 10;
+
   async function getRec() {
-    const response = await fetch("/api/rec");
+    const response = await fetch("/api/rec?count=" + numRec);
     favMovies = await response.json();
+    numRec += 10;
   }
 
   let ready = false;
