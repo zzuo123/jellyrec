@@ -2,16 +2,16 @@
   import arrow from "$lib/assets/arrow-right-circle.svg";
   import refresh from "$lib/assets/refresh.svg";
   import MovieCard from "./MovieCard.svelte";
-  import { favFetched} from "../../lib/store/store.js";
+  import { favFetched, numRec } from "../../lib/store/store.js";
+  import { get } from "svelte/store";
 
   let recMovies = { success: true, data: [] };
 
-  let numRec = 10;
-
   async function getRec() {
-    const response = await fetch("/api/rec?count=" + numRec);
+    let numRecCount = get(numRec);
+    const response = await fetch("/api/rec?count=" + numRecCount);
     recMovies = await response.json();
-    numRec += 10;
+    numRec.set(numRecCount + 10);
   }
 
   let ready = false;

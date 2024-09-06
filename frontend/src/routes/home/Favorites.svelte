@@ -3,7 +3,7 @@
   import refresh from "$lib/assets/refresh.svg";
   import { onMount } from "svelte";
   import MovieCard from "./MovieCard.svelte";
-  import { favFetched } from "../../lib/store/store.js";
+  import { favFetched, numRec } from "../../lib/store/store.js";
 
   let favMovies = { success: true, data: [] };
 
@@ -11,7 +11,9 @@
     const response = await fetch("/api/fav");
     favMovies = await response.json();
     if (favMovies.success == true) {
-        favFetched.set(true);
+      numRec.set(10);
+      favFetched.set(false);
+      favFetched.set(true);
     }
   }
 
