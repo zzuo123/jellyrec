@@ -21,15 +21,9 @@ First go to the `backend\.env` file in the backend/ directory with the following
 OMDB_API_KEY=<OMDB API Key (required: for retrieving information on recommended movies)>
 ```
 
-Some notes on obtaining the required environment variables:
+Some notes on obtaining the required environment variable(s):
 
 To get the OMDB API key, you would need to register for an account at [http://www.omdbapi.com/apikey.aspx](http://www.omdbapi.com/apikey.aspx).
-
-The Jellyfin URL is the url to your Jellyfin server. For example, if you are
-running Jellyfin on your local machine, the url would be `http://localhost:<port>`.
-If you are running Jellyfin on a server, the url would be `http://your-server-ip:<port?>`.
-If you used a reverse proxy, you can just input the url `http://your-ip-or-domain`.
-
 
 ### Install Docker
 
@@ -50,6 +44,16 @@ After you installed docker, everything is just as simple as running the followin
 docker compose up -d
 ```
 
+### Login from browser
+
+Now that we have the service setup, you can go to your favorite browser and try out the recommendation system. Open our browser of choice and navigate to [http://localhost:3000](http://localhost:3000) or [http://localhost:3000/login](http://localhost:3000/login), then login with your jellyfin server's url, username and password. And viola, that's it!
+
+Some note on jellyfin server url:
+
+The Jellyfin URL is the url to your Jellyfin server.
+For example, if you are running Jellyfin on your local machine, the url would be `http://localhost:<port>`.
+If you are running Jellyfin on a server, the url would be `http://your-server-ip:<port?>`.
+If you used a reverse proxy, you can just input the url `http://your-ip-or-domain`.
 
 ## API Endpoints
 
