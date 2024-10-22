@@ -2,42 +2,56 @@
 
 For more details, checkout this blog post: [https://zzuo123.github.io/blog/jellyrec/](https://zzuo123.github.io/blog/jellyrec/)
 
-## To login via environment variable:
+## QUICKSTART GUIDE
 
-First create a `.env` file in the backend/ directory with the following content:
+### Clone this repository
+
+First you would need to clone this repository and change into the repo's directory using the following commands:
+
+```bash
+git clone https://github.com/zzuo123/jellyrec.git
+cd jellyrec
+```
+
+### Set up OMDB API to retrieve poster and movie informaion
+
+First go to the `backend\.env` file in the backend/ directory with the following content:
 
 ```
-OMDB_API_KEY=<OMDB API Key (optional: for retrieving information on recommended movies)>
-JELLYFIN_API_KEY=<Your Jellyfin API Key>
-JELLYFIN_USERNAME=<Your Jellyfin USERNAME>
-JELLYFIN_PASSWORD=<Your Jellyfin PASSWORD>
-JELLYFIN_URL=<The url to your jellyfin server (possible with port if not 80 or 443)>
+OMDB_API_KEY=<OMDB API Key (required: for retrieving information on recommended movies)>
 ```
 
 Some notes on obtaining the required environment variables:
 
 To get the OMDB API key, you would need to register for an account at [http://www.omdbapi.com/apikey.aspx](http://www.omdbapi.com/apikey.aspx).
 
-To get the Jellyfin API key, you would need to be an admin on your Jellyfin server. From the hamburger menu, go to `Administration` -> `Dashboard` -> `API Keys` and press the `+` button to create a new API key.
+The Jellyfin URL is the url to your Jellyfin server. For example, if you are
+running Jellyfin on your local machine, the url would be `http://localhost:<port>`.
+If you are running Jellyfin on a server, the url would be `http://your-server-ip:<port?>`.
+If you used a reverse proxy, you can just input the url `http://your-ip-or-domain`.
 
-The Jellyfin URL is the url to your Jellyfin server. For example, if you are running Jellyfin on your local machine, the url would be `http://localhost:<port>`. If you are running Jellyfin on a server, the url would be `http://your-server-ip:<port?>`.
 
-## To install all dependencies (Python and NodeJS):
+### Install Docker
 
-```bash
-cd backend/
-npm install
-cd python/
-pip install -r requirements.txt
-```
-
-## To run the backend (Express JS API):
+First, you would need to install Docker using the official docker guide
+for your specific system: [https://docs.docker.com/get-started/get-docker/](https://docs.docker.com/get-started/get-docker/). To make sure docker is installed, start docker and run the following command on your terminal:
 
 ```bash
-npm start
+docker --version
 ```
 
-## API Endpoints:
+And it should give you an output that looks something like `Docker version x.x.x, build <hex>`.
+
+### Build Containers and Run Containers
+
+After you installed docker, everything is just as simple as running the following command:
+
+```bash
+docker compose up -d
+```
+
+
+## API Endpoints
 
 <!-- API endpoints with request body and result -->
 

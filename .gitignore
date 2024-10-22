@@ -7,5 +7,5 @@ downloads/
 __pycache__/
 ml-latest/
 ml-latest-filtered/
-.env
+# .env
 omdb_cache.json
