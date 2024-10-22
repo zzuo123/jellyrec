@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 
 export async function GET() {
-    let result = await fetch("http://localhost:4001/Movie/GetFavorite", {
+    let result = await fetch("http://backend:4001/Movie/GetFavorite", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

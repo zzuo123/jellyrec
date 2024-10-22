@@ -1,0 +1,12 @@
+version: '3.9'  # docker compose version
+
+services:
+  frontend:
+    build: frontend
+    ports:
+      - "3000:3000"
+  backend:
+    build: backend
+    ports:
+      - "8888:8888"
+      - "4001:4001"

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 
 export async function GET({ url }) {
     const count = url.searchParams.get("count") || 10;
-    let result = await fetch(`http://localhost:4001/Movie/GetRecommendation/${count}`, {
+    let result = await fetch(`http://backend:4001/Movie/GetRecommendation/${count}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

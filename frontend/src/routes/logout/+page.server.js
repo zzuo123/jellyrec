@@ -3,7 +3,7 @@ import { redirect } from "@sveltejs/kit";
 
 export const actions = {
   default: async ({ cookies }) => {
-    const response = await fetch("http://localhost:4001/Auth/logout", {
+    const response = await fetch("http://backend:4001/Auth/logout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -14,7 +14,7 @@ function isPathAllowed(path) {
 }
 
 async function checkLogin() {
-  let result = await fetch("http://localhost:4001/Auth/loggedin", {
+  let result = await fetch("http://backend:4001/Auth/loggedin", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

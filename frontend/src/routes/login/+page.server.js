@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 
 async function login(url, name, pw) {
-  const response = await fetch("http://localhost:4001/Auth/login", {
+  const response = await fetch("http://backend:4001/Auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -17,7 +17,7 @@ async function login(url, name, pw) {
 }
 
 async function checkLogin() {
-  let result = await fetch("http://localhost:4001/Auth/loggedin", {
+  let result = await fetch("http://backend:4001/Auth/loggedin", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
