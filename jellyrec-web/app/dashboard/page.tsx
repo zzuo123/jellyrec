@@ -1,31 +1,19 @@
-import { serverLogout } from "@/app/lib/actions";
-import { auth, signOut } from "@/auth";
+import { signOut } from "@/auth";
 
 export default async function DashboardPage() {
-    async function handleLogout() {
-        'use server';
-        const session = await auth();
-        if (session && session.user) {
-            const baseurl = session.user.baseurl as string;
-            const token = session.user.token as string;
-            const result = await serverLogout(baseurl, token);
-            if (result) {
-                await signOut({ redirectTo: '/' });
-            } else {
-                console.error("Failed to log out from server");
-            }
-        }
-    }
-
     // enable logout functionality with button click and handle any errors
     return (
         <div>
             <h1>Dashboard</h1>
-            <form action={handleLogout}>
-                <button type="submit" className="bg-red-500 text-white px-4 py-2 rounded">
-                    Logout
-                </button>
-            </form>
+        <form action={async () => {
+            'use server';
+            await signOut({ redirectTo: '/' });
+        }}>
+          <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
+            <div className="hidden md:block">Sign Out</div>
+          </button>
+        </form>
+
         </div>
     );
 }
