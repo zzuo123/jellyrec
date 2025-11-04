@@ -77,12 +77,12 @@ class Mapping:
         return [self.index_to_id[index] for index in indices]
 
 
-def compare_options(options1, options2):
+def same_dict(dict1, dict2):
     '''
-    Compare two options dictionaries
+    Check if two dictionaries are the same, returns True if both dictionaries have same content, False otherwise
     '''
-    for key in options1:
-        if options1[key] != options2[key]:
+    for key in dict1:
+        if dict1[key] != dict2[key]:
             return False
     return True
 
@@ -106,7 +106,7 @@ def cosine_knn_model(full_dataset, full_dataset_options):
             if os.path.exists(option_path):
                 with open(option_path, 'rb') as f:
                     options = pickle.load(f)
-                if compare_options(options, full_dataset_options):
+                if same_dict(options, full_dataset_options):
                     with open(pickle_path, 'rb') as f:
                         cosine_sim_model, mapping_movie = pickle.load(f)
                     return cosine_sim_model, mapping_movie
@@ -133,15 +133,15 @@ def cosine_knn_model(full_dataset, full_dataset_options):
     return cosine_sim_model, mapping_movie
     
 
-def recommend_movies(fav_movies_imdb, n=10, full_dataset=False, full_dataset_options={'user_min': 300, 'movie_min': 50, 'user_max': 500}):
+def recommend_movies(fav_imdb_ids, n=10, full_dataset=False, full_dataset_options={'user_min': 300, 'movie_min': 50, 'user_max': 500}):
     '''
-    Recommend n movies based on the cosine similarity model
+    Recommend n movies based on the favorite movies imdb ids (list of string starting with "tt", e.g. "tt0111161")
     '''
     # get the cosine similarity model and mapping
     cosine_sim_model, mapping_movie = cosine_knn_model(full_dataset, full_dataset_options)
 
     # convert the favorite movies imdb ids to movie ids
-    fav_movies = imdb_to_movieid(fav_movies_imdb, full_dataset)
+    fav_movies = imdb_to_movieid(fav_imdb_ids, full_dataset)
     fav_indices = mapping_movie.get_indices(fav_movies)
 
     # construct the user-interaction vector using fav_indices
