@@ -1,14 +1,14 @@
 'use client';
 
 import { useActionState } from 'react';
-import { authenticate } from '@/app/lib/actions';
+import { signIn } from '@/app/lib/actions';
 import { useSearchParams } from 'next/navigation';
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-  const [errorMessage, formAction, isPending] = useActionState(
-    authenticate,
+  const [state, action, pending] = useActionState(
+    signIn,
     undefined,
   );
 
@@ -17,7 +17,7 @@ export default function LoginForm() {
       <p className="text-white text-center text-xl font-medium m-0 pt-2.5 pb-2.5 bg-[#915F5F] rounded-t-[10px]">
         Login Using Jellyfin Credential
       </p>
-      <form action={formAction} className="p-5">
+      <form action={action} className="p-5">
         <hr className="border-white mb-5" />
         
         <label htmlFor="baseurl" className="text-white font-medium text-lg block">
@@ -29,7 +29,7 @@ export default function LoginForm() {
           type="text"
           placeholder="Jellyfin Server Url"
           className="w-full p-2 mt-1.5 mb-4 border-none bg-[rgba(217,217,217,0.7)] rounded-[10px] text-black font-medium text-base"
-          disabled={isPending}
+          disabled={pending}
         />
         
         <label htmlFor="username" className="text-white font-medium text-lg block">
@@ -41,8 +41,9 @@ export default function LoginForm() {
           type="text"
           placeholder="Username"
           className="w-full p-2 mt-1.5 mb-4 border-none bg-[rgba(217,217,217,0.7)] rounded-[10px] text-black font-medium text-base"
-          disabled={isPending}
+          disabled={pending}
         />
+        {state?.errors?.username && <p>{state.errors.username}</p>}
         
         <label htmlFor="password" className="text-white font-medium text-lg block">
           Password
@@ -53,22 +54,20 @@ export default function LoginForm() {
           type="password"
           placeholder="Password"
           className="w-full p-2 mt-1.5 mb-4 border-none bg-[rgba(217,217,217,0.7)] rounded-[10px] text-black font-medium text-base"
-          disabled={isPending}
+          disabled={pending}
         />
+        {state?.errors?.password && <p>{state.errors.password}</p>}
         
-        {errorMessage && (
-          <p className="text-red-200 text-sm mb-3 text-center">{errorMessage}</p>
-        )}
         
         <hr className="border-white mb-5" />
         
         <input type="hidden" name="callbackUrl" value={callbackUrl} />
 
         <button type="submit"
-          disabled={isPending}
+          disabled={pending}
           className="py-2.5 px-2.5 border-none bg-[#915F5F] cursor-pointer rounded-[5px] text-white text-base font-medium float-right disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#a06d6d] transition-colors"
         >
-          {isPending ? 'Logging in...' : 'Login'}
+          {pending ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>
