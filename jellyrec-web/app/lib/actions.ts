@@ -1,5 +1,5 @@
 'use server';
-import 'server-only'
+import 'server-only';
 import { createSession, getSession, deleteSession } from '@/app/lib/session';
 import { SessionPayload, FormSchema, FormState } from '@/app/lib/definitions';
 import { redirect } from 'next/navigation';
