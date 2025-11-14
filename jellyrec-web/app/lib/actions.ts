@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { Jellyfin } from '@jellyfin/sdk';
 import { getUserApi } from '@jellyfin/sdk/lib/utils/api/user-api.js';
 import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api.js';
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api.js';
 
 // Create a Jellyfin instance (can be reused)
 function createJellyfinInstance() {
@@ -181,4 +182,63 @@ export async function signOut() {
   console.log("User logged out locally");
   await deleteSession();
   redirect('/login');
+}
+
+export async function getFavoriteMovies() {
+  // Get favorite movies for the current user
+  const payload: SessionPayload | undefined = await getSession();
+  
+  if (!payload) {
+    throw new Error("Not authenticated");
+  }
+
+  try {
+    const jellyfin = createJellyfinInstance();
+    const api = jellyfin.createApi(payload.baseurl, payload.token);
+    
+    // Get current user info to extract userId
+    const userResponse = await getUserApi(api).getCurrentUser();
+    
+    if (!userResponse.data?.Id) {
+      throw new Error("Failed to get user information");
+    }
+    
+    const userId = userResponse.data.Id;
+    
+    // Get favorite movies
+    // In getFavoriteMovies function, update the fields array:
+    const response = await getItemsApi(api).getItems({
+      userId: userId,
+      filters: ['IsFavorite'],
+      includeItemTypes: ['Movie'],
+      recursive: true,
+      fields: [
+        'Overview', 
+        'Genres', 
+        'DateCreated', 
+        'PremiereDate', 
+        'CommunityRating', 
+        'OfficialRating',
+        'Taglines',
+        'Studios',
+        'People',
+        'VoteCount',
+        'RunTimeTicks'
+      ],
+      sortBy: ['SortName'],
+      sortOrder: ['Ascending']
+    });
+    
+    return response.data?.Items || [];
+  } catch (error: any) {
+    console.error("Failed to get favorite movies:", error);
+    
+    if (error.response?.status === 401) {
+      throw new Error("Session expired. Please log in again.");
+    } else if (error.request) {
+      throw new Error("Unable to reach the Jellyfin server.");
+    } else {
+      throw new Error(error.message || "Failed to retrieve favorite movies.");
+    }
+  }
 }
