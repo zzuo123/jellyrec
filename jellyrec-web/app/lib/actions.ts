@@ -50,14 +50,14 @@ export async function signIn(state: FormState, formData: FormData) {
   try {
     const jellyfin = createJellyfinInstance();
     const api = jellyfin.createApi(baseurl);
-    
+
     const response = await getUserApi(api).authenticateUserByName({
       authenticateUserByName: {
         Username: username,
         Pw: password
       }
     });
-    
+
     if (!response.data?.AccessToken || !response.data?.User?.Id) {
       return {
         errors: {
@@ -67,10 +67,10 @@ export async function signIn(state: FormState, formData: FormData) {
         message: "Invalid response from server. Please try again."
       };
     }
-    
+
     console.log("Authentication successful for user:", username);
     await createSession(username, response.data.AccessToken, baseurl);
-    
+
   } catch (error: any) {
     console.error("Authentication error:", error);
 
@@ -78,7 +78,7 @@ export async function signIn(state: FormState, formData: FormData) {
     if (error.response) {
       // Server responded with an error status
       const status = error.response.status;
-      
+
       if (status === 401 || status === 400) {
         return {
           errors: {
@@ -152,42 +152,50 @@ export async function signIn(state: FormState, formData: FormData) {
   }
 }
 
-export async function signOut() {
-  // logout user both locally and on the server
-  const cookieStore = await cookies();
-  const session = cookieStore.get('session')?.value;
-  const payload: SessionPayload | undefined = await getSession();
+export async function signOut(formData?: FormData) {
+  try {
+    console.log("Signing out");
+    // logout user both locally and on the server
+    const cookieStore = await cookies();
+    const session = cookieStore.get('session')?.value;
+    const payload: SessionPayload | undefined = await getSession();
 
-  // Attempt to logout from Jellyfin server
-  if (session && payload) {
-    try {
-      const jellyfin = createJellyfinInstance();
-      const api = jellyfin.createApi(payload.baseurl, payload.token);
-      
-      await getSessionApi(api).reportSessionEnded();
-      console.log("Logged out from Jellyfin server");
-    } catch (error: any) {
-      // Don't fail the logout if server logout fails
-      // Log the specific error for debugging
-      if (error.response?.status === 401) {
-        console.warn("Session already expired on server");
-      } else if (error.request) {
-        console.warn("Unable to reach server for logout - server may be down");
-      } else {
-        console.warn("Failed to logout from Jellyfin server:", error.message);
+    // Attempt to logout from Jellyfin server
+    if (session && payload) {
+      try {
+        const jellyfin = createJellyfinInstance();
+        const api = jellyfin.createApi(payload.baseurl, payload.token);
+
+        await getSessionApi(api).reportSessionEnded();
+        console.log("Logged out from Jellyfin server");
+      } catch (error: any) {
+        // Don't fail the logout if server logout fails
+        // Log the specific error for debugging
+        if (error.response?.status === 401) {
+          console.warn("Session already expired on server");
+        } else if (error.request) {
+          console.warn("Unable to reach server for logout - server may be down");
+        } else {
+          console.warn("Failed to logout from Jellyfin server:", error.message);
+        }
       }
     }
-  }
 
-  console.log("User logged out locally");
-  await deleteSession();
-  redirect('/login');
+    console.log("User logged out locally");
+    await deleteSession();
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error during sign out:", error);
+    // Ensure session is deleted even if an error occurs
+    await deleteSession();
+    return { success: false, error: "Failed to sign out" };
+  }
 }
 
 export async function getFavoriteMovies() {
   // Get favorite movies for the current user
   const payload: SessionPayload | undefined = await getSession();
-  
+
   if (!payload) {
     throw new Error("Not authenticated");
   }
@@ -195,16 +203,16 @@ export async function getFavoriteMovies() {
   try {
     const jellyfin = createJellyfinInstance();
     const api = jellyfin.createApi(payload.baseurl, payload.token);
-    
+
     // Get current user info to extract userId
     const userResponse = await getUserApi(api).getCurrentUser();
-    
+
     if (!userResponse.data?.Id) {
       throw new Error("Failed to get user information");
     }
-    
+
     const userId = userResponse.data.Id;
-    
+
     // Get favorite movies
     // In getFavoriteMovies function, update the fields array:
     const response = await getItemsApi(api).getItems({
@@ -213,11 +221,11 @@ export async function getFavoriteMovies() {
       includeItemTypes: ['Movie'],
       recursive: true,
       fields: [
-        'Overview', 
-        'Genres', 
-        'DateCreated', 
-        'PremiereDate', 
-        'CommunityRating', 
+        'Overview',
+        'Genres',
+        'DateCreated',
+        'PremiereDate',
+        'CommunityRating',
         'OfficialRating',
         'Taglines',
         'Studios',
@@ -228,11 +236,11 @@ export async function getFavoriteMovies() {
       sortBy: ['SortName'],
       sortOrder: ['Ascending']
     });
-    
+
     return response.data?.Items || [];
   } catch (error: any) {
     console.error("Failed to get favorite movies:", error);
-    
+
     if (error.response?.status === 401) {
       throw new Error("Session expired. Please log in again.");
     } else if (error.request) {
