@@ -11,12 +11,12 @@ interface MovieCardProps {
 
 export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const year = movie.PremiereDate ? new Date(movie.PremiereDate).getFullYear() : 'N/A';
   const rating = movie.CommunityRating ? movie.CommunityRating.toFixed(1) : 'N/A';
-  
+
   // Construct image URL for the movie poster
-  const imageUrl = movie.Id 
+  const imageUrl = movie.Id
     ? `${baseUrl}/Items/${movie.Id}/Images/Primary?maxHeight=400&tag=${movie.ImageTags?.Primary}&quality=90`
     : '/placeholder-movie.png';
 
@@ -27,9 +27,9 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
   return (
     <>
       {/* Movie Card */}
-      <div 
+      <div
         onClick={() => setIsModalOpen(true)}
-        className="group cursor-pointer bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
+        className="group cursor-pointer bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
       >
         {/* Movie Poster */}
         <div className="relative aspect-[2/3] bg-gray-200 overflow-hidden">
@@ -47,17 +47,17 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
 
         {/* Movie Info */}
         <div className="p-4">
-          <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-1 group-hover:text-blue-600 transition-colors">
+          <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-1 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {movie.Name}
           </h3>
-          <div className="text-sm text-gray-600 mb-2">
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
             {year} {movie.OfficialRating && `• ${movie.OfficialRating}`}
           </div>
-          
+
           {movie.Genres && movie.Genres.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {movie.Genres.slice(0, 2).map((genre: string) => (
-                <span 
+                <span
                   key={genre}
                   className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full"
                 >
@@ -65,7 +65,7 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                 </span>
               ))}
               {movie.Genres.length > 2 && (
-                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
                   +{movie.Genres.length - 2}
                 </span>
               )}
@@ -76,12 +76,12 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
 
       {/* Modal */}
       {isModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn"
           onClick={() => setIsModalOpen(false)}
         >
-          <div 
-            className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-slideUp"
+          <div
+            className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-slideUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Backdrop Image */}
@@ -117,11 +117,11 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
 
                 {/* Title and Meta */}
                 <div className="flex-grow">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                     {movie.Name}
                   </h2>
-                  
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-4">
+
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-300 mb-4">
                     <span className="flex items-center gap-1">
                       <span className="text-yellow-500">⭐</span>
                       <span className="font-semibold">{rating}</span>
@@ -131,7 +131,7 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                     {movie.OfficialRating && (
                       <>
                         <span>•</span>
-                        <span className="px-2 py-0.5 bg-gray-200 rounded">
+                        <span className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-200 rounded">
                           {movie.OfficialRating}
                         </span>
                       </>
@@ -148,9 +148,9 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                   {movie.Genres && movie.Genres.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {movie.Genres.map((genre: string) => (
-                        <span 
+                        <span
                           key={genre}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium"
+                          className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full font-medium"
                         >
                           {genre}
                         </span>
@@ -160,7 +160,7 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
 
                   {/* Tagline */}
                   {movie.Tagline && (
-                    <p className="text-gray-600 italic mb-4">
+                    <p className="text-gray-600 dark:text-gray-400 italic mb-4">
                       "{movie.Tagline}"
                     </p>
                   )}
@@ -170,8 +170,8 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
               {/* Overview */}
               {movie.Overview && (
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Overview</h3>
-                  <p className="text-gray-700 leading-relaxed">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Overview</h3>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                     {movie.Overview}
                   </p>
                 </div>
@@ -182,8 +182,8 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                 {/* Director */}
                 {movie.People?.find((p: any) => p.Type === 'Director') && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Director</h4>
-                    <p className="text-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Director</h4>
+                    <p className="text-gray-700 dark:text-gray-300">
                       {movie.People.find((p: any) => p.Type === 'Director').Name}
                     </p>
                   </div>
@@ -192,8 +192,8 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                 {/* Studio */}
                 {movie.Studios && movie.Studios.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Studio</h4>
-                    <p className="text-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Studio</h4>
+                    <p className="text-gray-700 dark:text-gray-300">
                       {movie.Studios.map((s: any) => s.Name).join(', ')}
                     </p>
                   </div>
@@ -202,8 +202,8 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                 {/* Release Date */}
                 {movie.PremiereDate && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Release Date</h4>
-                    <p className="text-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Release Date</h4>
+                    <p className="text-gray-700 dark:text-gray-300">
                       {new Date(movie.PremiereDate).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
@@ -216,8 +216,8 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                 {/* Community Rating Count */}
                 {movie.VoteCount && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Votes</h4>
-                    <p className="text-gray-700">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Votes</h4>
+                    <p className="text-gray-700 dark:text-gray-300">
                       {movie.VoteCount.toLocaleString()} votes
                     </p>
                   </div>
@@ -227,15 +227,15 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
               {/* Cast */}
               {movie.People && movie.People.filter((p: any) => p.Type === 'Actor').length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Cast</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Cast</h3>
                   <div className="flex flex-wrap gap-3">
                     {movie.People
                       .filter((p: any) => p.Type === 'Actor')
                       .slice(0, 6)
                       .map((actor: any) => (
-                        <div 
+                        <div
                           key={actor.Id}
-                          className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2"
+                          className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2"
                         >
                           {actor.PrimaryImageTag && (
                             <img
@@ -245,11 +245,11 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
                             />
                           )}
                           <div>
-                            <p className="font-medium text-gray-900 text-sm">
+                            <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">
                               {actor.Name}
                             </p>
                             {actor.Role && (
-                              <p className="text-xs text-gray-600">
+                              <p className="text-xs text-gray-600 dark:text-gray-400">
                                 {actor.Role}
                               </p>
                             )}
@@ -264,31 +264,6 @@ export function MovieCard({ movie, baseUrl, token }: MovieCardProps) {
         </div>
       )}
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }
-        
-        .animate-slideUp {
-          animation: slideUp 0.3s ease-out;
-        }
-      `}</style>
     </>
   );
 }
