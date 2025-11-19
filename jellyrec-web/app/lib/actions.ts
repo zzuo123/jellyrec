@@ -152,9 +152,8 @@ export async function signIn(state: FormState, formData: FormData) {
   }
 }
 
-export async function signOut(formData?: FormData) {
+export async function logoutAction() {
   try {
-    console.log("Signing out");
     // logout user both locally and on the server
     const cookieStore = await cookies();
     const session = cookieStore.get('session')?.value;
@@ -167,7 +166,7 @@ export async function signOut(formData?: FormData) {
         const api = jellyfin.createApi(payload.baseurl, payload.token);
 
         await getSessionApi(api).reportSessionEnded();
-        console.log("Logged out from Jellyfin server");
+        console.log("User logged out from Jellyfin server");
       } catch (error: any) {
         // Don't fail the logout if server logout fails
         // Log the specific error for debugging
@@ -181,7 +180,6 @@ export async function signOut(formData?: FormData) {
       }
     }
 
-    console.log("User logged out locally");
     await deleteSession();
     return { success: true };
   } catch (error) {
