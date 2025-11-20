@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { MovieCard } from "@/app/ui/movie-card";
 import { RecommendationCard } from "@/app/ui/recommendation-card";
 
@@ -9,10 +10,24 @@ interface DashboardContentProps {
     movies: any[];
     recommendations: any[];
     session: any;
+    currentLimit: number;
 }
 
-export function DashboardContent({ movies, recommendations, session }: DashboardContentProps) {
+export function DashboardContent({ movies, recommendations, session, currentLimit }: DashboardContentProps) {
     const [activeTab, setActiveTab] = useState<'favorites' | 'recommendations'>('favorites');
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const [isPending, startTransition] = useTransition();
+
+    const handleLoadMore = () => {
+        const params = new URLSearchParams(searchParams);
+        params.set('n', (currentLimit + 12).toString());
+
+        startTransition(() => {
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        });
+    };
 
     return (
         <>
@@ -23,8 +38,8 @@ export function DashboardContent({ movies, recommendations, session }: Dashboard
                         <button
                             onClick={() => setActiveTab('favorites')}
                             className={`px-6 py-3 rounded-t-lg font-semibold shadow-sm border-b-2 transition-all duration-300 ${activeTab === 'favorites'
-                                    ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-purple-600 dark:border-purple-500'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200 border-transparent'
+                                ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-purple-600 dark:border-purple-500'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200 border-transparent'
                                 }`}
                         >
                             <div className="flex items-center gap-2">
@@ -37,8 +52,8 @@ export function DashboardContent({ movies, recommendations, session }: Dashboard
                         <button
                             onClick={() => setActiveTab('recommendations')}
                             className={`px-6 py-3 rounded-t-lg font-semibold shadow-sm border-b-2 transition-all duration-300 ${activeTab === 'recommendations'
-                                    ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-purple-600 dark:border-purple-500'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200 border-transparent'
+                                ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-purple-600 dark:border-purple-500'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200 border-transparent'
                                 }`}
                         >
                             <div className="flex items-center gap-2">
@@ -205,13 +220,36 @@ export function DashboardContent({ movies, recommendations, session }: Dashboard
                                         </h2>
                                     </div>
 
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-8">
                                         {recommendations.map((movie: any) => (
                                             <RecommendationCard
                                                 key={movie.imdb_id}
                                                 movie={movie}
                                             />
                                         ))}
+                                    </div>
+
+                                    <div className="flex justify-center pb-8">
+                                        <button
+                                            onClick={handleLoadMore}
+                                            disabled={isPending}
+                                            className="group relative px-8 py-3 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 font-semibold rounded-full shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 border border-purple-100 dark:border-purple-900 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                                        >
+                                            <span className={`flex items-center gap-2 ${isPending ? 'opacity-0' : 'opacity-100'}`}>
+                                                Load More Movies
+                                                <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </span>
+                                            {isPending && (
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <svg className="animate-spin h-5 w-5 text-purple-600 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </button>
                                     </div>
                                 </section>
                             )}

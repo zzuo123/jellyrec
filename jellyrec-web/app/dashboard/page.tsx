@@ -6,11 +6,18 @@ import { LogoutButton } from "@/app/ui/logout-button";
 import { get_rec } from "@/app/lib/recs";
 import { DashboardContent } from "@/app/dashboard/dashboard-content";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ n?: string }>;
+}) {
   let movies: any[] = [];
   let error = null;
   let session;
   let recommendations: any[] = [];
+  const { n } = await searchParams;
+  const parsedLimit = parseInt(n || '12');
+  const limit = isNaN(parsedLimit) ? 12 : parsedLimit;
 
   try {
     session = await getSession();
@@ -26,7 +33,7 @@ export default async function DashboardPage() {
 
       if (favMovies.length > 0) {
         try {
-          recommendations = await get_rec(favMovies, 10);
+          recommendations = await get_rec(favMovies, limit);
         } catch (e) {
           console.error("Failed to get recommendations", e);
         }
@@ -84,6 +91,7 @@ export default async function DashboardPage() {
           movies={movies}
           recommendations={recommendations}
           session={session}
+          currentLimit={limit}
         />
       )}
 
