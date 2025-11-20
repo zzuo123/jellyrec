@@ -1,1 +1,0 @@
-<h1>Logging you out (you shouldn't see this, if you do something went wrong with Sveltekit)</h1>
