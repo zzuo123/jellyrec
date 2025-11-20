@@ -229,7 +229,8 @@ export async function getFavoriteMovies() {
         'Studios',
         'People',
         'VoteCount',
-        'RunTimeTicks'
+        'RunTimeTicks',
+        'ProviderIds'
       ],
       sortBy: ['SortName'],
       sortOrder: ['Ascending']
