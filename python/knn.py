@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from convert import imdb_to_movieid, movieid_to_imdb, movieid_to_title
 import pickle
+import re
 
 
 base_path = os.path.abspath(os.path.dirname(__file__)) + '/downloads/'
@@ -18,9 +19,17 @@ def get_user_item_matrix(full_dataset=False, full_dataset_options=None):
     Read the ratings.csv file and return a user-item matrix
     '''
     # check if the pickled user-item matrix exists
+    print("getting user-item matrix")
     
     if full_dataset:
-        pickle_path = full_dataset_path + 'user_item_matrix.pkl'
+        print("full dataset")
+        if full_dataset_options:
+            print("full dataset with options")
+            # stringify the options and prepend to the pickle
+            options_str = re.sub(r"'|{|}|:| |,", "_", str(full_dataset_options))
+            pickle_path = full_dataset_path + 'user_item_matrix_' + options_str + '.pkl'
+        else:
+            pickle_path = full_dataset_path + 'user_item_matrix.pkl'
     else:
         pickle_path = small_dataset_path + 'user_item_matrix.pkl'
     if os.path.exists(pickle_path):
@@ -35,7 +44,7 @@ def get_user_item_matrix(full_dataset=False, full_dataset_options=None):
         ratings_path = small_dataset_path + 'ratings.csv'
     ratings = pd.read_csv(ratings_path)
 
-    if full_dataset:
+    if full_dataset and full_dataset_options:
         # filter the ratings to the specified options
         ratings = ratings.groupby('userId').filter(lambda x: len(x) >= full_dataset_options['user_min'])
         ratings = ratings.groupby('movieId').filter(lambda x: len(x) >= full_dataset_options['movie_min'])
