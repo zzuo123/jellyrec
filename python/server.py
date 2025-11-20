@@ -24,7 +24,7 @@ def makeJsonResponse(data, status_code):
     return make_response(jsonify(data), status_code)
 
 
-@app.route('/recommend', methods=['GET'])
+@app.route('/recommend', methods=['POST'])
 def recommend():
     try:
         data = request.json

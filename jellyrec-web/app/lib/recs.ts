@@ -45,9 +45,9 @@ async function add_info_omdb(movies: any[]) {
     return movies;
 }
 
-export async function get_rec(favMovies: any[], n: number, full_dataset: boolean, full_dataset_options: any) {
+export async function get_rec(favMovies: any[], n: number) {  //, full_dataset: boolean, full_dataset_options: any) {
     const imdb_ids = favMovies.map(movie => movie.imdb_id);
-    const response = await fetch(`${REC_BACKEND_URL}/recs`, {
+    const response = await fetch(`${REC_BACKEND_URL}/recommend`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -55,12 +55,12 @@ export async function get_rec(favMovies: any[], n: number, full_dataset: boolean
         body: JSON.stringify({
             "fav_movies_imdb": imdb_ids,
             "n": n,
-            "full_dataset": full_dataset,
-            "full_dataset_options": full_dataset_options
+            "full_dataset": false
+            // "full_dataset_options": full_dataset_options
         })
     });
     if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
     const data = await response.json();
-    const recMovies = await add_info_omdb(data);
+    const recMovies = await add_info_omdb(data.recommendations);
     return recMovies;
 }
