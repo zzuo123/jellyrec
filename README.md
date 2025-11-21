@@ -1,137 +1,250 @@
-# JellyRec: A Jellyfin Movie/Show Recommender
+# 🎬 JellyRec: Movie Recommendations for Jellyfin
 
-For more details, checkout this blog post: [https://zzuo123.github.io/blog/jellyrec/](https://zzuo123.github.io/blog/jellyrec/)
+Get personalized movie and TV show recommendations based on your Jellyfin favorites!
 
-## QUICKSTART GUIDE
+For more details, check out this blog post: [https://zzuo123.github.io/blog/jellyrec/](https://zzuo123.github.io/blog/jellyrec/)
 
-### Clone this repository
+---
 
-First you would need to clone this repository and change into the repo's directory using the following commands:
+## 🚀 Quick Start (Easy Mode!)
+
+Follow these simple steps to get JellyRec running on your computer:
+
+### Step 1: Install Docker
+
+Docker is a tool that makes it easy to run applications. You only need to install it once.
+
+1. **Download Docker** for your system:
+   - **Windows/Mac**: Download [Docker Desktop](https://docs.docker.com/get-docker/)
+   - **Linux**: Follow the [official guide](https://docs.docker.com/engine/install/)
+
+2. **Verify Docker is installed** by opening a terminal/command prompt and typing:
+   ```bash
+   docker --version
+   ```
+   You should see something like `Docker version 24.0.0`
+
+### Step 2: Download JellyRec
+
+Open a terminal/command prompt and run these commands:
 
 ```bash
+# Download the code
 git clone https://github.com/zzuo123/jellyrec.git
+
+# Go into the folder
 cd jellyrec
 ```
 
-### Set up OMDB API to retrieve poster and movie informaion
+### Step 3: Configure Environment Variables
 
-First go to the `backend\.env` file in the backend/ directory with the following content:
-
-```
-OMDB_API_KEY=<OMDB API Key (required: for retrieving information on recommended movies)>
-```
-
-Some notes on obtaining the required environment variable(s):
-
-To get the OMDB API key, you would need to register for an account at [http://www.omdbapi.com/apikey.aspx](http://www.omdbapi.com/apikey.aspx).
-
-### Install Docker
-
-First, you would need to install Docker using the official docker guide
-for your specific system: [https://docs.docker.com/get-started/get-docker/](https://docs.docker.com/get-started/get-docker/). To make sure docker is installed, start docker and run the following command on your terminal:
+Create a file called `.env` in the `jellyrec-web` folder with these settings:
 
 ```bash
-docker --version
+# Navigate to the web folder
+cd jellyrec-web
+
+# Create the .env file (use your favorite text editor)
+# On Windows: notepad .env
+# On Mac/Linux: nano .env
 ```
 
-And it should give you an output that looks something like `Docker version x.x.x, build <hex>`.
+Add this content to the `.env` file:
 
-### Build Containers and Run Containers
+```env
+# Session secret for authentication (use a random string)
+SESSION_SECRET=your-super-secret-random-string-here
 
-After you installed docker, everything is just as simple as running the following command:
+# Python API URL (keep this as-is for Docker)
+REC_BACKEND_URL=http://python-api:8888
+
+# OMDB API Key for movie posters and information
+OMDB_API_KEY=your-omdb-api-key-here
+```
+
+**💡 How to get these values:**
+
+1. **SESSION_SECRET**: Generate a secure random string:
+   ```bash
+   openssl rand -base64 32
+   ```
+
+2. **REC_BACKEND_URL**: Keep as `http://python-api:8888` for Docker (already correct above)
+
+3. **OMDB_API_KEY**: Get a free API key:
+   - Go to [http://www.omdbapi.com/apikey.aspx](http://www.omdbapi.com/apikey.aspx)
+   - Enter your email and select "FREE" (1,000 daily requests)
+   - Check your email and click the activation link
+   - Copy the API key and paste it in your `.env` file
+
+Then go back to the main folder:
+```bash
+cd ..
+```
+
+### Step 4: Start JellyRec
+
+From the `jellyrec` folder, run:
 
 ```bash
 docker compose up -d
 ```
 
-### Login from browser
+This will:
+- ✅ Download everything needed
+- ✅ Build the application
+- ✅ Start the services in the background
 
-Now that we have the service setup, you can go to your favorite browser and try out the recommendation system. Open our browser of choice and navigate to [http://localhost:3000](http://localhost:3000) or [http://localhost:3000/login](http://localhost:3000/login), then login with your jellyfin server's url, username and password. And viola, that's it!
+**⏱️ First time setup takes 2-3 minutes**
 
-Some note on jellyfin server url:
+### Step 5: Open JellyRec in Your Browser
 
-The Jellyfin URL is the url to your Jellyfin server.
-For example, if you are running Jellyfin on your local machine, the url would be `http://localhost:<port>`.
-If you are running Jellyfin on a server, the url would be `http://your-server-ip:<port?>`.
-If you used a reverse proxy, you can just input the url `http://your-ip-or-domain`.
+1. Open your web browser
+2. Go to: **http://localhost:3000**
+3. You'll see the login page!
 
-## API Endpoints
+---
 
-<!-- API endpoints with request body and result -->
+## 🔐 Logging In
 
-### POST /Auth/login
+On the login page, you'll need to enter:
 
-Authenticate with Jellyfin server. Optional if provided in environment variables.
+1. **Jellyfin Server URL**: The web address of your Jellyfin server
+   - Local example: `http://localhost:8096`
+   - Remote example: `http://192.168.1.100:8096`
+   - With domain: `https://jellyfin.yourdomain.com`
 
-Request Body:
+2. **Username**: Your Jellyfin username
 
-```json
-{
-    "username": "username",
-    "password": "password",
-    "baseurl": "http://localhost:8096"
-}
+3. **Password**: Your Jellyfin password
+
+Click "Sign In" and you're ready to get recommendations! 🎉
+
+---
+
+## 📋 Useful Commands
+
+### Check if JellyRec is running
+```bash
+docker compose ps
 ```
 
-Result:
+### View logs (helpful for troubleshooting)
+```bash
+# All services
+docker compose logs -f
 
-```json
-{
-  "message": "ok",
-}
+# Just the web app
+docker compose logs -f web
+
+# Just the recommendation engine
+docker compose logs -f python-api
 ```
 
-### GET /Movies/GetFavorite
-
-Get favorite movies from Jellyfin server.
-
-Request Body:
-
-```json
-{}
+### Stop JellyRec
+```bash
+docker compose down
 ```
 
-Result:
-
-```json
-[
-  {
-    "id": "movie id in jf server",
-    "name": "movie title/name",
-    "imdb_id": "movie imdb id if available (begins with tt and 7 digits padded with 0)",
-    "jf_image_url": "link to movie poster in jf server",
-  },
-]
+### Restart JellyRec
+```bash
+docker compose restart
 ```
 
-### GET /Movies/GetRecommendaion/<number of recommendation (default: 10)>
+### Update to the latest version
+```bash
+# Pull the latest code
+git pull
 
-Get movie recommendations based on favorite movies.
-
-Request Body:
-
-```json
-{}
+# Rebuild and restart
+docker compose up -d --build
 ```
 
-Result:
+---
 
-```json
-[
-  {
-    "imdb_id": "movie imdb id if available",
-    "imdb_url": "https://www.imdb.com/title/<imdb_id>",
-    "title": "movie name/title",
-    "released": "01 Jan 2001",
-    "rating": "8.0",
-    "plot": "description of the plot",
-    "genre": "CSV of genres",
-    "poster_url": "link to movie poster",
-    "director": "CSV of directors",
-    "actors": "CSV of actors",
-    "awards": "description of awards",
-    "runtime": "<n> min",
-    "language": "CSV of languages",
-  },
-]
+## 🛠️ Troubleshooting
+
+### "Cannot connect to Docker daemon"
+- Make sure Docker Desktop is running
+- On Windows/Mac: Check the system tray for the Docker icon
+
+### "Port 3000 is already in use"
+- Another application is using port 3000
+- Edit `docker-compose.yml` and change `"3000:3000"` to `"3001:3000"` (or any other port)
+- Then access JellyRec at `http://localhost:3001`
+
+### "Login failed" or "Cannot connect to Jellyfin"
+- Double-check your Jellyfin server URL
+- Make sure your Jellyfin server is running
+- Verify your username and password are correct
+
+### Container won't start
+```bash
+# Check the logs for errors
+docker compose logs
+
+# Try rebuilding from scratch
+docker compose down
+docker compose up -d --build
 ```
+
+---
+
+## 🔧 Advanced: Development Mode
+
+If you want to run JellyRec without Docker (for development):
+
+### Backend (Python API)
+```bash
+cd python
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python server.py
+```
+
+### Frontend (Next.js)
+```bash
+cd jellyrec-web
+npm install
+npm run dev
+```
+
+**Note**: For local development, change `REC_BACKEND_URL` in `.env` to `http://localhost:8888`
+
+---
+
+## 📊 How It Works
+
+1. **You log in** with your Jellyfin credentials
+2. **JellyRec analyzes** your favorited movies
+3. **Machine learning** finds similar movies to your favorites
+4. **Get recommendations** tailored to your taste!
+
+---
+
+## 🤝 Contributing
+
+Found a bug or want to add a feature? Contributions are welcome!
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+---
+
+## 📝 License
+
+This project is open source. Check the LICENSE file for details.
+
+---
+
+## 💬 Need Help?
+
+- **Issues**: [GitHub Issues](https://github.com/zzuo123/jellyrec/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/zzuo123/jellyrec/discussions)
+
+---
+
+**Made with ❤️ for the Jellyfin community**

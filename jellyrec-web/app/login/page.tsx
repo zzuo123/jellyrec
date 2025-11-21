@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
+import { Suspense } from 'react';
 import LoginForm from '@/app/ui/login-form';
 
 const roboto = Roboto({
@@ -31,7 +32,9 @@ export default function LoginPage() {
           Movie Recommendation System with Jellyfin Integration
         </p>
         <div className="flex justify-center items-center flex-col">
+          <Suspense fallback={<div className="text-white">Loading...</div>}>
             <LoginForm />
+          </Suspense>
         </div>
       </div>
 

@@ -1,12 +1,53 @@
-version: '3.9'  # docker compose version
-
 services:
-  frontend:
-    build: frontend
-    ports:
-      - "3000:3000"
-  backend:
-    build: backend
+  # Python recommendation engine
+  python-api:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    container_name: jellyrec-python
     ports:
       - "8888:8888"
-      - "4001:4001"
+    volumes:
+      # Persist downloads and cache
+      - ./python/downloads:/app/downloads
+      - ./python/omdb_cache.json:/app/omdb_cache.json
+    restart: unless-stopped
+    networks:
+      - jellyrec-network
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:8888')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Next.js web application
+  web:
+    build:
+      context: ./jellyrec-web
+      dockerfile: Dockerfile
+    container_name: jellyrec-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # IMPORTANT: REC_BACKEND_URL must use the Docker service name
+      # For Docker: http://python-api:8888
+      # For local dev: http://localhost:8888
+      - REC_BACKEND_URL=http://python-api:8888
+    env_file:
+      # Copy your .env file and update REC_BACKEND_URL to use http://python-api:8888
+      - ./jellyrec-web/.env
+    depends_on:
+      python-api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - jellyrec-network
+
+networks:
+  jellyrec-network:
+    driver: bridge
+
+volumes:
+  python-downloads:
