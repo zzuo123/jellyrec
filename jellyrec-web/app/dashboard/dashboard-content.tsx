@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useTransition } from 'react';
@@ -13,8 +12,11 @@ interface DashboardContentProps {
     currentLimit: number;
 }
 
+type SortOption = 'default' | 'release_date' | 'rating' | 'title';
+
 export function DashboardContent({ movies, recommendations, session, currentLimit }: DashboardContentProps) {
     const [activeTab, setActiveTab] = useState<'favorites' | 'recommendations'>('favorites');
+    const [sortOption, setSortOption] = useState<SortOption>('default');
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -28,6 +30,74 @@ export function DashboardContent({ movies, recommendations, session, currentLimi
             router.replace(`${pathname}?${params.toString()}`, { scroll: false });
         });
     };
+
+    const getSortedMovies = () => {
+        if (!movies) return [];
+        const sorted = [...movies];
+        switch (sortOption) {
+            case 'release_date':
+                return sorted.sort((a, b) => new Date(b.PremiereDate).getTime() - new Date(a.PremiereDate).getTime());
+            case 'rating':
+                return sorted.sort((a, b) => (b.CommunityRating || 0) - (a.CommunityRating || 0));
+            case 'title':
+                return sorted.sort((a, b) => a.Name.localeCompare(b.Name));
+            case 'default':
+            default:
+                return sorted;
+        }
+    };
+
+    const getSortedRecommendations = () => {
+        if (!recommendations) return [];
+        const sorted = [...recommendations];
+        switch (sortOption) {
+            case 'release_date':
+                return sorted.sort((a, b) => {
+                    const dateA = a.released !== 'N/A' ? new Date(a.released).getTime() : 0;
+                    const dateB = b.released !== 'N/A' ? new Date(b.released).getTime() : 0;
+                    return dateB - dateA;
+                });
+            case 'rating':
+                return sorted.sort((a, b) => {
+                    const ratingA = a.rating !== 'N/A' ? parseFloat(a.rating) : 0;
+                    const ratingB = b.rating !== 'N/A' ? parseFloat(b.rating) : 0;
+                    return ratingB - ratingA;
+                });
+            case 'title':
+                return sorted.sort((a, b) => a.title.localeCompare(b.title));
+            case 'default':
+            default:
+                return sorted;
+        }
+    };
+
+    const sortedMovies = getSortedMovies();
+    const sortedRecommendations = getSortedRecommendations();
+
+    const SortDropdown = () => (
+        <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Sort by:</span>
+            <div className="relative inline-block text-left">
+                <div className="relative">
+                    <select
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value as SortOption)}
+                        className="appearance-none pl-4 pr-10 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer transition-colors shadow-sm"
+                    >
+                        <option value="default">Default</option>
+                        <option value="release_date">Release Date</option>
+                        <option value="rating">Rating</option>
+                        <option value="title">Title</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <>
@@ -165,19 +235,13 @@ export function DashboardContent({ movies, recommendations, session, currentLimi
                                             </span>
                                         </h2>
 
-                                        {/* Future: Sort/Filter options */}
                                         <div className="flex items-center gap-2">
-                                            <button className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all flex items-center gap-2">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                                                </svg>
-                                                Sort
-                                            </button>
+                                            <SortDropdown />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                                        {movies.map((movie: any) => (
+                                        {sortedMovies.map((movie: any) => (
                                             <MovieCard
                                                 key={movie.Id}
                                                 movie={movie}
@@ -218,10 +282,13 @@ export function DashboardContent({ movies, recommendations, session, currentLimi
                                                 ({recommendations.length})
                                             </span>
                                         </h2>
+                                        <div className="flex items-center gap-2">
+                                            <SortDropdown />
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-8">
-                                        {recommendations.map((movie: any) => (
+                                        {sortedRecommendations.map((movie: any) => (
                                             <RecommendationCard
                                                 key={movie.imdb_id}
                                                 movie={movie}
