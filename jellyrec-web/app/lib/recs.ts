@@ -3,15 +3,25 @@
 
 import dotenv from 'dotenv';
 import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 dotenv.config();
 const REC_BACKEND_URL = process.env.REC_BACKEND_URL || 'http://localhost:8888'
 const OMDB_API_KEY = process.env.OMDB_API_KEY || '';
 
+// Use /tmp directory for cache file (writable in Docker and most systems)
+const CACHE_FILE = path.join(os.tmpdir(), 'jellyrec_omdb_cache.json');
+
 // when module is imported, read file or create empty array if file does not exist
 let info: any[] = [];
-if (fs.existsSync('omdb_cache.json')) {
-    info = JSON.parse(fs.readFileSync('omdb_cache.json', 'utf-8'));
+try {
+    if (fs.existsSync(CACHE_FILE)) {
+        info = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+    }
+} catch (error) {
+    console.warn('Failed to read OMDB cache, starting fresh:', error);
+    info = [];
 }
 
 async function get_info(imdb_id: string) {
@@ -22,7 +32,14 @@ async function get_info(imdb_id: string) {
     if (!response.ok) { return result; }
     result = await response.json();
     info.push(result);
-    fs.writeFileSync('omdb_cache.json', JSON.stringify(info));
+
+    // Try to write cache, but don't fail if we can't
+    try {
+        fs.writeFileSync(CACHE_FILE, JSON.stringify(info));
+    } catch (error) {
+        console.warn('Failed to write OMDB cache:', error);
+    }
+
     return result;
 }
 
