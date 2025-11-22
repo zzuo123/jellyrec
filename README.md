@@ -4,6 +4,10 @@ Get personalized movie and TV show recommendations based on your Jellyfin favori
 
 For more details, check out this blog post: [https://zzuo123.github.io/blog/jellyrec/](https://zzuo123.github.io/blog/jellyrec/)
 
+To checkout a hosted instance, visit [https://jrh1823rhui34y8.gzuo.me/login](https://jrh1823rhui34y8.gzuo.me/login) and login with your jellyfin credentials (or use the jellyfin demo page & credential). Note that you'll need to have at least 1/ONE movie favorited to generate recommendations. 
+
+Have fun and enjoy! 
+
 ---
 
 ## 🚀 Quick Start (Easy Mode!)
