@@ -16,8 +16,16 @@ export default async function DashboardPage({
   let session;
   let recommendations: any[] = [];
   const { n } = await searchParams;
+
+  const maxRecommendationsEnv = process.env.MAX_RECOMMENDATIONS;
+  const maxRecommendations = maxRecommendationsEnv ? parseInt(maxRecommendationsEnv) : Infinity;
+
   const parsedLimit = parseInt(n || '12');
-  const limit = isNaN(parsedLimit) ? 12 : parsedLimit;
+  let limit = isNaN(parsedLimit) ? 12 : parsedLimit;
+
+  if (maxRecommendations !== Infinity && limit > maxRecommendations) {
+    limit = maxRecommendations;
+  }
 
   try {
     session = await getSession();
@@ -92,6 +100,7 @@ export default async function DashboardPage({
           recommendations={recommendations}
           session={session}
           currentLimit={limit}
+          maxLimit={maxRecommendations}
         />
       )}
 

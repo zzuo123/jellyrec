@@ -10,11 +10,12 @@ interface DashboardContentProps {
     recommendations: any[];
     session: any;
     currentLimit: number;
+    maxLimit: number;
 }
 
 type SortOption = 'default' | 'release_date' | 'rating' | 'title';
 
-export function DashboardContent({ movies, recommendations, session, currentLimit }: DashboardContentProps) {
+export function DashboardContent({ movies, recommendations, session, currentLimit, maxLimit }: DashboardContentProps) {
     const [activeTab, setActiveTab] = useState<'favorites' | 'recommendations'>('favorites');
     const [sortOption, setSortOption] = useState<SortOption>('default');
     const router = useRouter();
@@ -24,7 +25,9 @@ export function DashboardContent({ movies, recommendations, session, currentLimi
 
     const handleLoadMore = () => {
         const params = new URLSearchParams(searchParams);
-        params.set('n', (currentLimit + 12).toString());
+        const nextLimit = currentLimit + 12;
+        const targetLimit = (maxLimit !== Infinity && nextLimit > maxLimit) ? maxLimit : nextLimit;
+        params.set('n', targetLimit.toString());
 
         startTransition(() => {
             router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -299,14 +302,16 @@ export function DashboardContent({ movies, recommendations, session, currentLimi
                                     <div className="flex justify-center pb-8">
                                         <button
                                             onClick={handleLoadMore}
-                                            disabled={isPending}
+                                            disabled={isPending || (maxLimit !== Infinity && currentLimit >= maxLimit)}
                                             className="group relative px-8 py-3 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 font-semibold rounded-full shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 border border-purple-100 dark:border-purple-900 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                                         >
                                             <span className={`flex items-center gap-2 ${isPending ? 'opacity-0' : 'opacity-100'}`}>
-                                                Load More Movies
-                                                <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                </svg>
+                                                {(maxLimit !== Infinity && currentLimit >= maxLimit) ? 'No More Recommendations' : 'Load More Movies'}
+                                                {!(maxLimit !== Infinity && currentLimit >= maxLimit) && (
+                                                    <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                )}
                                             </span>
                                             {isPending && (
                                                 <div className="absolute inset-0 flex items-center justify-center">

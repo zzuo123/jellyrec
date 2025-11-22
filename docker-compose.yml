@@ -35,6 +35,8 @@ services:
       # For Docker: http://python-api:8888
       # For local dev: http://localhost:8888
       - REC_BACKEND_URL=http://python-api:8888
+      # Optional: Limit the number of recommendations a user can load
+      # - MAX_RECOMMENDATIONS=100
     env_file:
       # Copy your .env file and update REC_BACKEND_URL to use http://python-api:8888
       - ./jellyrec-web/.env
