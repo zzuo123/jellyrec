@@ -10,6 +10,23 @@ Have fun and enjoy!
 
 ---
 
+## Important Notice About Vulnerable Next.js Version
+
+If you are have setup JellyRec before December 7, 2025, please update to the latest version of JellyRec as soon as possible. There was a security vulnerability in Next.js (used by the jellyrec\_web frontend) version 16.0.1 called [CVE-2025-666478](https://github.com/vercel/next.js/security/advisories/GHSA-9qr9-h5gf-34mp) that stems from [CVE-2025-55182](https://www.cve.org/CVERecord?id=CVE-2025-55182) in React.js that would give the attacker remote code execution capabilities. Therefore, PLEASE UPDATE JELLYREC IMMEDIATELY if you are running an older version.
+
+### To update JellyRec to the latest version:
+
+```bash
+# Go to your jellyrec folder
+cd jellyrec
+# Pull the latest code
+git pull
+# Rebuild and restart
+docker compose up -d --build
+# (optional) remove old images to free up space (enter y to confirm)
+docker image prune
+```
+
 ## 🚀 Quick Start (Easy Mode!)
 
 Follow these simple steps to get JellyRec running on your computer:
